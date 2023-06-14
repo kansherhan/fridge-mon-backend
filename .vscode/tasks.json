@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run server(debug)",
+      "type": "shell",
+      "command": "python server.py --debug"
+    },
+    {
+      "label": "Run server",
+      "type": "shell",
+      "command": "python server.py"
+    }
+  ]
+}
