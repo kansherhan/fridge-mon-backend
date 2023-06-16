@@ -1,23 +1,19 @@
 from sanic import Request
 from sanic.exceptions import Unauthorized
 
-
-async def _check_token(request) -> bool:
-    return True
-
-    if not request.token:
-        return False
-
-    try:
-        return True
-    except:
-        return False
-    else:
-        return True
+from apps.auth.models import CompanyEmployeeToken as Token
 
 
 async def authentication_middleware(request: Request):
-    if await _check_token(request):
-        pass
-    else:
+    if not hasattr(request.route.ctx, "unauthorized_request"):
+        return
+
+    if not request.token:
         raise Unauthorized()
+
+    token = Token.get_or_none(Token.token == request.token)
+
+    if token == None:
+        raise Unauthorized()
+
+    request.ctx.user = token.employee

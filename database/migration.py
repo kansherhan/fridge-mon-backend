@@ -6,7 +6,6 @@ from sanic import Sanic
 from sanic.config import Config
 from peewee import PostgresqlDatabase
 
-from dispatcher import create_config
 from database.base_models import BaseModel
 
 __APPS_MODELS_FILE__ = "models"

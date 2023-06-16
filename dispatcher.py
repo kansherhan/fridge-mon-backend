@@ -21,7 +21,7 @@ class SanicContext:
 
 def create_config() -> Config:
     config = Config()
-    config.update_config(("./config.py"))
+    config.update_config("./config.py")
 
     return config
 

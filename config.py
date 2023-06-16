@@ -15,6 +15,7 @@ DATABASE_TABLENAME = "fridje_mon"
 
 OAS_URL_PREFIX = "/apidocs"
 
-CORS_ORIGINS = ",".join(["http://localhost"])
+CORS_ORIGINS = "*"
+# CORS_ORIGINS = ",".join(["http://localhost"])
 
 REDIRECTS = {}

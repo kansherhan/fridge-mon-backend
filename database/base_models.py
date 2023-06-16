@@ -1,6 +1,7 @@
-from peewee import Model, PrimaryKeyField, DateTimeField, SQL
-from sanic import Sanic, json
+from enum import Enum
 from datetime import datetime
+from peewee import Model, CharField, PrimaryKeyField, DateTimeField
+from sanic import Sanic, json
 
 
 class BaseModel(Model):
@@ -18,8 +19,8 @@ class BaseModel(Model):
 
 
 class TimestampedModel(BaseModel):
-    created_at = DateTimeField(constraints=[SQL("DEFAULT CURRENT_TIMESTAMP")])
-    updated_at = DateTimeField(constraints=[SQL("DEFAULT CURRENT_TIMESTAMP")])
+    created_at = DateTimeField()
+    updated_at = DateTimeField()
 
     def save(self, *args, **kwargs):
         current_time = datetime.now()
@@ -30,3 +31,15 @@ class TimestampedModel(BaseModel):
         self.updated_at = current_time
 
         return super(TimestampedModel, self).save(*args, **kwargs)
+
+
+class EnumField(CharField):
+    def __init__(self, enum: type[Enum], *args, **kwargs):
+        self.enum = enum
+        super(CharField, self).__init__(*args, **kwargs)
+
+    def db_value(self, value):
+        return value.value
+
+    def python_value(self, value):
+        return self.enum(value)

@@ -8,7 +8,7 @@ __APPS_ROUTES_FILE__ = "routes"
 
 
 def register_routes(app: Sanic):
-    @app.get("/", ctx_label="something")
+    @app.get("/")
     async def main_page(request: Request):
         return text("Hello, World!")
 
