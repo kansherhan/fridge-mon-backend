@@ -7,6 +7,14 @@ from sanic import Sanic, json
 class BaseModel(Model):
     id = PrimaryKeyField(unique=True)
 
+    @classmethod
+    def find_by_id(cls, id: int):
+        return cls.get_or_none(cls.id == id)
+
+    @classmethod
+    def find_all(cls):
+        return cls.select().order_by(cls.id)
+
     def to_dict(self):
         return self.__data__
 

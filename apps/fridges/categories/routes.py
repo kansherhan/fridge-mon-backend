@@ -1,16 +1,14 @@
 from sanic import Blueprint, Request, json
 from sanic.exceptions import NotFound
 
-from .models import FridgeCategory
+from .models import FridgeCategory as Category
 
 routes = Blueprint("categories", "/categories")
 
 
 @routes.get("/")
 async def get_categories(request: Request):
-    categories: list[FridgeCategory] = FridgeCategory.select().order_by(
-        FridgeCategory.id
-    )
+    categories: list[Category] = Category.get_all()
 
     categories_dicts = [c.to_dict() for c in categories]
 
@@ -19,9 +17,7 @@ async def get_categories(request: Request):
 
 @routes.get("/<category_id:int>")
 async def get_category(request: Request, category_id: int):
-    category: FridgeCategory = FridgeCategory.get_or_none(
-        FridgeCategory.id == category_id
-    )
+    category: Category = Category.find_by_id(category_id)
 
     if category != None:
         return category.to_json_response()

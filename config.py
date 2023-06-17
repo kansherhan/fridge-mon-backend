@@ -15,6 +15,8 @@ DATABASE_TABLENAME = "fridje_mon"
 
 OAS_URL_PREFIX = "/apidocs"
 
+FALLBACK_ERROR_FORMAT = "json"
+
 CORS_ORIGINS = "*"
 # CORS_ORIGINS = ",".join(["http://localhost"])
 

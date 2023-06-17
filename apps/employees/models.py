@@ -1,7 +1,7 @@
 from database.base_models import TimestampedModel, CharField
 
 
-class CompanyEmployee(TimestampedModel):
+class Employee(TimestampedModel):
     first_name = CharField()
     last_name = CharField()
     email = CharField(unique=True)
