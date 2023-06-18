@@ -1,4 +1,4 @@
-from sanic import Blueprint, Request
+from sanic import Blueprint, Request, json
 from sanic.exceptions import NotFound
 
 from .models import Company
@@ -8,12 +8,16 @@ routes = Blueprint("companies", "/companies")
 
 @routes.get("/")
 async def get_companies(request: Request):
-    pass
+    companies: list[Company] = Company.find_all()
+
+    companies_dicts = [c.to_dict() for c in companies]
+
+    return json(companies_dicts)
 
 
 @routes.get("/<company_id:int>")
 async def get_company(request: Request, company_id: int):
-    company: Company = Company.get_or_none(Company.id == company_id)
+    company: Company = Company.find_by_id(company_id)
 
     if company != None:
         return company.to_json_response()

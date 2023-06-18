@@ -5,7 +5,10 @@ from apps.auth.models import EmployeeToken as Token
 
 
 async def authentication_middleware(request: Request):
-    if not hasattr(request.route.ctx, "unauthorized_request"):
+    if not request.app.config.AUTHORIZATION:
+        return
+
+    if hasattr(request.route.ctx, "unauthorized_request"):
         return
 
     if not request.token:

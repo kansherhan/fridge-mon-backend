@@ -11,7 +11,9 @@ DATABASE_PORT = 5432
 DATABASE_HOST = "localhost"
 DATABASE_USERNAME = "postgres"
 DATABASE_PASSWORD = "postgres"
-DATABASE_TABLENAME = "fridje_mon"
+DATABASE_TABLENAME = "refrigerator-project"
+
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 OAS_URL_PREFIX = "/apidocs"
 

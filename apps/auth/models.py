@@ -6,7 +6,7 @@ from ..employees.models import Employee
 
 
 class EmployeeToken(BaseModel):
-    employee = ForeignKeyField(Employee, backref="employees", lazy_load=False)
+    employee = ForeignKeyField(Employee, backref="employees")
     token = CharField()
     token_created_at = DateTimeField()
 
@@ -18,3 +18,6 @@ class EmployeeToken(BaseModel):
         tokenModel.token_created_at = datetime.now()
 
         return tokenModel
+
+    class Meta:
+        table_name = "company_employee_tokens"

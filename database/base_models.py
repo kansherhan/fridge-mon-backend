@@ -16,10 +16,18 @@ class BaseModel(Model):
         return cls.select().order_by(cls.id)
 
     def to_dict(self):
-        return self.__data__
+        dicts = {}
+
+        for key in self.__data__.keys():
+            if type(self.__data__[key]) == datetime:
+                dicts[key] = self.__data__[key].strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                dicts[key] = self.__data__[key]
+
+        return dicts
 
     def to_json_response(self, **kwargs):
-        return json(self, default=lambda o: o.to_dict(), sort_keys=True, **kwargs)
+        return json(self, default=lambda o: o.to_dict(), **kwargs)
 
     class Meta:
         database = Sanic.get_app().ctx.db

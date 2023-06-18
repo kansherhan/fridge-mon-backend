@@ -8,7 +8,7 @@ routes = Blueprint("categories", "/categories")
 
 @routes.get("/")
 async def get_categories(request: Request):
-    categories: list[Category] = Category.get_all()
+    categories: list[Category] = Category.find_all()
 
     categories_dicts = [c.to_dict() for c in categories]
 

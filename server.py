@@ -1,14 +1,11 @@
-from sys import argv as sys_args
-from functools import partial
-
 from sanic import Sanic
 from sanic.worker.loader import AppLoader
 
 from dispatcher import create_app
 
 
-def bootstrap(debug: bool):
-    loader = AppLoader(factory=partial(create_app, debug))
+def bootstrap():
+    loader = AppLoader(factory=create_app)
     app = loader.load()
 
     app.prepare(
@@ -21,4 +18,4 @@ def bootstrap(debug: bool):
 
 
 if __name__ == "__main__":
-    bootstrap("--debug" in sys_args)
+    bootstrap()
