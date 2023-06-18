@@ -2,7 +2,7 @@ from enum import Enum
 
 from peewee import ForeignKeyField, CharField, DecimalField
 
-from database.base_models import TimestampedModel, EnumField, BaseModel
+from database.base_models import TimestampedModel, EnumField
 
 from ..company.models import Company
 from ..enterprises.models import Enterprise
@@ -18,7 +18,7 @@ class FridgeStatus(Enum):
     BROKEN = "broken"
 
 
-class Fridge(BaseModel):
+class Fridge(TimestampedModel):
     serial_number = CharField()
 
     company = ForeignKeyField(Company, backref=__FRIDGE_BACKREF__)
