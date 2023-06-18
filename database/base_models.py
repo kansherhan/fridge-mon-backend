@@ -1,7 +1,9 @@
 from enum import Enum
 from datetime import datetime
-from peewee import Model, CharField, PrimaryKeyField, DateTimeField
+from decimal import Decimal
+
 from sanic import Sanic, json
+from peewee import Model, CharField, PrimaryKeyField, DateTimeField
 
 
 class BaseModel(Model):
@@ -19,10 +21,17 @@ class BaseModel(Model):
         dicts = {}
 
         for key in self.__data__.keys():
-            if type(self.__data__[key]) == datetime:
-                dicts[key] = self.__data__[key].strftime("%Y-%m-%d %H:%M:%S")
+            value = self.__data__[key]
+            value_type = type(value)
+
+            if value_type == datetime:
+                dicts[key] = value.strftime("%Y-%m-%d %H:%M:%S")
+            elif value_type == Decimal:
+                dicts[key] = "{0:f}".format(value)
+            elif isinstance(value, Enum):
+                dicts[key] = value.value
             else:
-                dicts[key] = self.__data__[key]
+                dicts[key] = value
 
         return dicts
 

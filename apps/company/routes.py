@@ -2,6 +2,9 @@ from sanic import Blueprint, Request, json
 from sanic.exceptions import NotFound
 
 from .models import Company
+from ..enterprises.models import Enterprise
+
+from helper import models_to_json, model_not_none
 
 routes = Blueprint("companies", "/companies")
 
@@ -10,23 +13,30 @@ routes = Blueprint("companies", "/companies")
 async def get_companies(request: Request):
     companies: list[Company] = Company.find_all()
 
-    companies_dicts = [c.to_dict() for c in companies]
-
-    return json(companies_dicts)
+    return models_to_json(companies)
 
 
 @routes.get("/<company_id:int>")
 async def get_company(request: Request, company_id: int):
-    company: Company = Company.find_by_id(company_id)
+    query: list[Company] = (
+        Company.select(Company, Enterprise)
+        .join(Enterprise)
+        .where(Company.id == company_id)
+    )
 
-    if company != None:
-        return company.to_json_response()
-    else:
-        raise NotFound(f"Could not find company with id = {company_id}")
+    enterprises = []
+
+    for company in query:
+        enterprises.append(company.enterprise.to_dict())
+
+    company = model_not_none(company).to_dict()
+    company["enterprises"] = enterprises
+
+    return json(company)
 
 
-@routes.post("/<company_id:int>")
-async def create_company(request: Request, company_id: int):
+@routes.post("/")
+async def create_company(request: Request):
     pass
 
 

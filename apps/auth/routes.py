@@ -29,10 +29,3 @@ async def logout(request: Request):
 @validate(json=RegistrationParams)
 async def registration(request: Request, params: RegistrationParams):
     pass
-
-
-def generate_key():
-    from binascii import hexlify
-    from os import urandom
-
-    return hexlify(urandom(20)).decode()

@@ -1,7 +1,7 @@
-from sanic import Blueprint, Request, json
-from sanic.exceptions import NotFound
+from sanic import Blueprint, Request
 
 from .models import FridgeManufacturer as Manufacturer
+from helper import models_to_json, model_not_none
 
 routes = Blueprint("manufacturers", "/manufacturers")
 
@@ -10,16 +10,11 @@ routes = Blueprint("manufacturers", "/manufacturers")
 async def get_manufacturers(request: Request):
     manufacturers: list[Manufacturer] = Manufacturer.find_all()
 
-    manufacturer_dicts = [m.to_dict() for m in manufacturers]
-
-    return json(manufacturer_dicts)
+    return models_to_json(manufacturers)
 
 
 @routes.get("/<manufacturer_id:int>")
 async def get_manufacturer(request: Request, manufacturer_id: int):
     manufacturer: Manufacturer = Manufacturer.find_by_id(manufacturer_id)
 
-    if manufacturer != None:
-        return manufacturer.to_json_response()
-    else:
-        raise NotFound(f"Could not find manufacturer with id = {manufacturer_id}")
+    return model_not_none(manufacturer).to_json_response()

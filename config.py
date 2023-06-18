@@ -16,6 +16,7 @@ DATABASE_TABLENAME = "refrigerator-project"
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 OAS_URL_PREFIX = "/apidocs"
+OAS_UI_SWAGGER = False
 
 FALLBACK_ERROR_FORMAT = "json"
 

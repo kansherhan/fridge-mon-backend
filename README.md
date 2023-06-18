@@ -6,19 +6,19 @@
 pip install -r requirements.txt
 ```
 
-Запуск программу:
+Запустить программу:
 
 ```sh
 python server.py
 ```
 
-Запуск программу на режиме разработчика:
+Запустить программу в режиме разработчика:
 
 ```sh
 python server.py --debug
 ```
 
-Запуск программы без авторизации:
+Запустить программу, без авторизации:
 
 ```sh
 python server.py --no-auth
@@ -26,4 +26,4 @@ python server.py --no-auth
 
 > Можно совмещать аргументы для запуска
 
-> Чтобы посмотреть все роутинги: http://localhost:8000/apidocs
+> Чтобы посмотреть все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs)

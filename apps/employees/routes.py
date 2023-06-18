@@ -1,20 +1,19 @@
 from sanic import Blueprint, Request
 
+from .models import Employee
+
 routes = Blueprint("employees", "/employees")
 
 
 @routes.get("/")
-async def get_employees(request: Request):
-    pass
+async def get_current_employees(request: Request):
+    employee: Employee = request.ctx.user
+
+    return employee.to_json_response()
 
 
 @routes.get("/<employee_id:int>")
 async def get_employee(request: Request, _id: int):
-    pass
-
-
-@routes.post("/<employee_id:int>")
-async def create_employee(request: Request, _id: int):
     pass
 
 
