@@ -14,7 +14,3 @@ __pycache__/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-# Assets folder
-assets/*
-!assets/.gitkeep
