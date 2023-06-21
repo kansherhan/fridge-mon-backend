@@ -1,23 +1,12 @@
-from datetime import datetime
-from peewee import ForeignKeyField, CharField, DateTimeField
+from peewee import ForeignKeyField, CharField
 
-from database.base_models import BaseModel
+from database.base_models import TimestampedModel
 from ..employees.models import Employee
 
 
-class EmployeeToken(BaseModel):
-    employee = ForeignKeyField(Employee, backref="employees")
+class EmployeeToken(TimestampedModel):
+    employee = ForeignKeyField(Employee, backref="tokens", lazy_load=False)
     token = CharField()
-    token_created_at = DateTimeField()
-
-    @staticmethod
-    def new(token: str, employee: Employee):
-        tokenModel = EmployeeToken()
-        tokenModel.token = token
-        tokenModel.employee = employee
-        tokenModel.token_created_at = datetime.now()
-
-        return tokenModel
 
     class Meta:
         table_name = "company_employee_tokens"

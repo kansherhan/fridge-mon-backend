@@ -1,5 +1,4 @@
 from sanic import Blueprint, Request, json
-from sanic.exceptions import NotFound
 
 from .models import Company
 from ..enterprises.models import Enterprise
@@ -24,10 +23,7 @@ async def get_company(request: Request, company_id: int):
         .where(Company.id == company_id)
     )
 
-    enterprises = []
-
-    for company in query:
-        enterprises.append(company.enterprise.to_dict())
+    enterprises = [company.enterprise.to_dict() for company in query]
 
     company = model_not_none(company).to_dict()
     company["enterprises"] = enterprises

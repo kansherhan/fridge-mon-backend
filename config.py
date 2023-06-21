@@ -11,7 +11,7 @@ DATABASE_PORT = 5432
 DATABASE_HOST = "localhost"
 DATABASE_USERNAME = "postgres"
 DATABASE_PASSWORD = "postgres"
-DATABASE_TABLENAME = "refrigerator-project"
+DATABASE_TABLENAME = "fridges_project"
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -20,7 +20,9 @@ OAS_UI_SWAGGER = False
 
 FALLBACK_ERROR_FORMAT = "json"
 
-CORS_ORIGINS = "*"
-# CORS_ORIGINS = ",".join(["http://localhost"])
+TOKEN_LIFETIME = 86400
+TOKEN_LENGTH = 32
+
+CORS_ORIGINS = "*"  # ",".join(["http://localhost", "example.com"])
 
 REDIRECTS = {}

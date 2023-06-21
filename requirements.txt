@@ -1,5 +1,6 @@
 sanic==23.3.0
 sanic-ext==23.3.0
-peewee==3.16.0
-psycopg2==2.9.6
+asyncpg==0.27.0
+pydantic==1.10.9
+tortoise-orm==0.19.3
 bcrypt==4.0.1

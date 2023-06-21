@@ -12,6 +12,7 @@ def bootstrap():
         host=app.config.APP_HOST,
         port=app.config.APP_PORT,
         dev=app.config.APP_DEBUG,
+        workers=3,
         auto_reload=True,
     )
     Sanic.serve(primary=app, app_loader=loader)

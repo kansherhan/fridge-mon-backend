@@ -7,6 +7,12 @@ from peewee import Model, CharField, PrimaryKeyField, DateTimeField
 
 
 class BaseModel(Model):
+    _formatters = {
+        datetime: lambda value: value.strftime("%Y-%m-%d %H:%M:%S"),
+        Decimal: lambda value: "{0:f}".format(value),
+        Enum: lambda value: value.value,
+    }
+
     id = PrimaryKeyField(unique=True)
 
     @classmethod
@@ -20,16 +26,11 @@ class BaseModel(Model):
     def to_dict(self):
         dicts = {}
 
-        for key in self.__data__.keys():
-            value = self.__data__[key]
-            value_type = type(value)
+        for key, value in self.__data__.items():
+            formatter = self._formatters.get(type(value))
 
-            if value_type == datetime:
-                dicts[key] = value.strftime("%Y-%m-%d %H:%M:%S")
-            elif value_type == Decimal:
-                dicts[key] = "{0:f}".format(value)
-            elif isinstance(value, Enum):
-                dicts[key] = value.value
+            if formatter != None:
+                dicts[key] = formatter(value)
             else:
                 dicts[key] = value
 
