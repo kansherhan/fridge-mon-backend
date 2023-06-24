@@ -1,6 +1,7 @@
 from sanic import Blueprint, Request
 
 from .models import Enterprise
+from ..employees.models import Employee
 
 from helper import models_to_json
 
@@ -12,9 +13,11 @@ routes = Blueprint("enterprises", "/enterprises")
 
 @routes.get(f"{__ENTERPRISE_COMPANY_PATH__}/all")
 async def get_enterprises(request: Request, company_id: int):
+    user: Employee = request.ctx.user
+
     enterprises: list[Enterprise] = (
         Enterprise.select()
-        .where(Enterprise.company == company_id)
+        .where((Enterprise.company == company_id))
         .order_by(Enterprise.id)
     )
 

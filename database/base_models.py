@@ -23,11 +23,18 @@ class BaseModel(Model):
     def find_all(cls):
         return cls.select().order_by(cls.id)
 
+    @classmethod
+    def _get_formatter(cls, value):
+        for type, formatter in cls._formatters.items():
+            if isinstance(value, type):
+                return formatter
+        return None
+
     def to_dict(self):
         dicts = {}
 
         for key, value in self.__data__.items():
-            formatter = self._formatters.get(type(value))
+            formatter = self._get_formatter(value)
 
             if formatter != None:
                 dicts[key] = formatter(value)

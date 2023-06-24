@@ -25,7 +25,7 @@ async def get_company(request: Request, company_id: int):
 
     enterprises = [company.enterprise.to_dict() for company in query]
 
-    company = model_not_none(company).to_dict()
+    company = model_not_none(query[0]).to_dict()
     company["enterprises"] = enterprises
 
     return json(company)

@@ -26,8 +26,11 @@ class Fridge(TimestampedModel):
     category = ForeignKeyField(Category, backref=__FRIDGE_BACKREF__)
     manufacturer = ForeignKeyField(Manufacturer, backref=__FRIDGE_BACKREF__)
 
-    temperature_upper = DecimalField(max_digits=5, decimal_places=2)
-    temperature_lower = DecimalField(max_digits=5, decimal_places=2)
+    temperature_upper = DecimalField(max_digits=5, decimal_places=2, null=True)
+    temperature_lower = DecimalField(max_digits=5, decimal_places=2, null=True)
+
+    average_temperature = DecimalField(max_digits=7, decimal_places=2, null=True)
+    average_humidity = DecimalField(max_digits=7, decimal_places=2, null=True)
 
     status = EnumField(FridgeStatus)
 

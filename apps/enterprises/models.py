@@ -14,8 +14,8 @@ class Enterprise(TimestampedModel):
     latitude = FloatField()
     longitude = FloatField()
 
-    phone = CharField(max_length=20)
-    email = CharField(max_length=50)
+    phone = CharField(max_length=20, null=True)
+    email = CharField(max_length=50, null=True)
 
     icon_url = CharField(null=True)
 
