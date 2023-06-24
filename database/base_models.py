@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from sanic import Sanic, json
-from peewee import Model, CharField, PrimaryKeyField, DateTimeField
+from peewee import Model, PrimaryKeyField, DateTimeField
 
 
 class BaseModel(Model):
@@ -64,15 +64,3 @@ class TimestampedModel(BaseModel):
         self.updated_at = current_time
 
         return super(TimestampedModel, self).save(*args, **kwargs)
-
-
-class EnumField(CharField):
-    def __init__(self, enum: type[Enum], *args, **kwargs):
-        self.enum = enum
-        super(CharField, self).__init__(*args, **kwargs)
-
-    def db_value(self, value):
-        return value.value
-
-    def python_value(self, value):
-        return self.enum(value)

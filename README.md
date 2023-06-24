@@ -26,4 +26,4 @@ python server.py --no-auth
 
 > Можно совмещать аргументы для запуска
 
-> Чтобы посмотреть все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs)
+> Что бы посмотреть все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs)
