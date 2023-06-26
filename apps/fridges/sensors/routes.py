@@ -10,6 +10,8 @@ sensor_routes = Blueprint("sensors", "/")
 
 @sensor_routes.get("/<fridge_id:int>")
 async def get_sensors_by_fridges(request: Request, fridge_id: int):
+    """Отправлять информацию о сенсорах в холодильнике"""
+
     fridge: Fridge = Fridge.get_or_none(Fridge.id == fridge_id)
 
     fridge_sensors: list[dict] = []

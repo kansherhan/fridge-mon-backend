@@ -12,6 +12,8 @@ async def get_sensor_on_measurements(
     request: Request,
     sensor_id: int,
 ):
+    """Отправлять информацию о всех изменениях состояния сенсора"""
+
     measurements = (
         SensorMeasurement.select()
         .where(SensorMeasurement.sensor == sensor_id)

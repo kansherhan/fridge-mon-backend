@@ -1,25 +1,27 @@
 from sanic import Blueprint, Request, json
 
 from .models import Company
-from ..employees.roles.models import CompanyRole
+from ..employees.roles.models import EmployeeRole
 from ..employees.models import Employee
-from ..enterprises.models import Enterprise
 
-from helper import models_to_json, model_not_none
+from helper import models_to_json, model_not_none, models_to_dicts
 
 routes = Blueprint("companies", "/companies")
 
 
 @routes.get("/")
 async def get_companies(request: Request):
+    """Отправляет все компания в котором работает пользователь"""
+
     def _company_exists(role_company: Company, companies: list[Company]) -> bool:
         return any(map(lambda _company: _company.id == role_company.id, companies))
 
     user: Employee = request.ctx.user
 
     companies: list[Company] = []
+    user_roles: list[EmployeeRole] = user.roles
 
-    for role in user.roles:
+    for role in user_roles:
         role_company: Company = role.company
 
         if not _company_exists(role_company, companies):
@@ -30,30 +32,11 @@ async def get_companies(request: Request):
 
 @routes.get("/<company_id:int>")
 async def get_company(request: Request, company_id: int):
-    query: list[Company] = (
-        Company.select(Company, Enterprise)
-        .join(Enterprise)
-        .where(Company.id == company_id)
-    )
+    """Можно получить все компания по ID и их корпорации"""
 
-    enterprises = [company.enterprise.to_dict() for company in query]
+    company: Company = model_not_none(Company.get_or_none(Company.id == company_id))
 
-    company = model_not_none(query[0]).to_dict()
-    company["enterprises"] = enterprises
+    company_dict = company.to_dict()
+    company_dict["enterprises"] = models_to_dicts(company.enterprises)
 
-    return json(company)
-
-
-@routes.post("/")
-async def create_company(request: Request):
-    pass
-
-
-@routes.put("/<company_id:int>")
-async def update_company(request: Request, company_id: int):
-    pass
-
-
-@routes.delete("/<company_id:int>")
-async def remove_company(request: Request, company_id: int):
-    pass
+    return json(company_dict)

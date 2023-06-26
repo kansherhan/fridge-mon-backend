@@ -19,6 +19,7 @@ routes = Blueprint("auth", "/auth")
 @validate(json=LoginParams)
 async def login(request: Request, body: LoginParams):
     """Авторизации в системе"""
+
     employee: Employee = Employee.get_or_none(Employee.email == body.email)
 
     if employee != None:
@@ -42,6 +43,8 @@ async def login(request: Request, body: LoginParams):
 
 @routes.post("/logout")
 async def logout(request: Request):
+    """Выйти из системы, удаления всех токенов авторизации"""
+
     user: Employee = request.ctx.user
 
     for token in user.tokens:
@@ -53,6 +56,8 @@ async def logout(request: Request):
 @routes.post("/registration", ctx_unauthorized_request=True)
 @validate(json=RegistrationParams)
 async def registration(request: Request, body: RegistrationParams):
+    """Регистрация в системе"""
+
     employee: Employee = Employee.get_or_none(Employee.email == body.email)
 
     if employee != None:
