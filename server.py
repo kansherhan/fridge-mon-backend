@@ -11,7 +11,7 @@ def bootstrap():
     app.prepare(
         host=app.config.APP_HOST,
         port=app.config.APP_PORT,
-        dev=app.config.APP_DEBUG,
+        dev=app.config.DEBUG,
         workers=3,
         auto_reload=True,
     )

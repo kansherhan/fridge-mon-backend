@@ -23,9 +23,9 @@ def create_config() -> Config:
     config = Config()
     config.update_config("./config.py")
 
-    config.APP_DEBUG = "--debug" in sys_args
+    config.DEBUG = "--debug" in sys_args
     config.AUTHORIZATION = not "--no-auth" in sys_args
-    config.OAS = config.APP_DEBUG
+    config.OAS = config.DEBUG
 
     return config
 
