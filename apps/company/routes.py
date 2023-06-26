@@ -1,6 +1,8 @@
 from sanic import Blueprint, Request, json
 
 from .models import Company
+from ..employees.roles.models import CompanyRole
+from ..employees.models import Employee
 from ..enterprises.models import Enterprise
 
 from helper import models_to_json, model_not_none
@@ -10,7 +12,18 @@ routes = Blueprint("companies", "/companies")
 
 @routes.get("/")
 async def get_companies(request: Request):
-    companies: list[Company] = Company.find_all()
+    def _company_exists(role_company: Company, companies: list[Company]) -> bool:
+        return any(map(lambda _company: _company.id == role_company.id, companies))
+
+    user: Employee = request.ctx.user
+
+    companies: list[Company] = []
+
+    for role in user.roles:
+        role_company: Company = role.company
+
+        if not _company_exists(role_company, companies):
+            companies.append(role_company)
 
     return models_to_json(companies)
 

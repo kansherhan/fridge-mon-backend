@@ -1,6 +1,7 @@
 from sanic import Blueprint, Request
 
 from .models import Employee
+from helper import model_not_none
 
 routes = Blueprint("employees", "/employees")
 
@@ -13,15 +14,7 @@ async def get_current_employees(request: Request):
 
 
 @routes.get("/<employee_id:int>")
-async def get_employee(request: Request, _id: int):
-    pass
+async def get_employee(request: Request, employee_id: int):
+    employee: Employee = Employee.get_or_none(Employee.id == employee_id)
 
-
-@routes.put("/<employee_id:int>")
-async def update_employee(request: Request, _id: int):
-    pass
-
-
-@routes.delete("/<employee_id:int>")
-async def remove_employee(request: Request, _id: int):
-    pass
+    return model_not_none(employee).to_json_response()

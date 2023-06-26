@@ -4,6 +4,8 @@ from .models import Fridge
 
 from .manufacturers.routes import routes as manufacturers_routes
 from .categories.routes import routes as categories_routes
+from .products.routes import routes as products_routes
+from .sensors.routes import routes as sensors_routes
 
 from helper import models_to_json
 
@@ -38,5 +40,10 @@ async def remove_fridge(request: Request, enterprises_id: int, fridge_id: int):
 
 
 routes = Blueprint.group(
-    fridges_routes, manufacturers_routes, categories_routes, url_prefix="/fridges"
+    fridges_routes,
+    manufacturers_routes,
+    categories_routes,
+    products_routes,
+    sensors_routes,
+    url_prefix="/fridges",
 )

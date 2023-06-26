@@ -15,6 +15,8 @@ class BaseModel(Model):
 
     id = PrimaryKeyField(unique=True)
 
+    __DICT_IGNORE__ = []
+
     @classmethod
     def find_by_id(cls, id: int):
         return cls.get_or_none(cls.id == id)
@@ -30,10 +32,16 @@ class BaseModel(Model):
                 return formatter
         return None
 
-    def to_dict(self):
+    def to_dict(self, ignore_keys: list[str] = None):
+        if ignore_keys == None:
+            ignore_keys = getattr(self, "__DICT_IGNORE__", None)
+
         dicts = {}
 
         for key, value in self.__data__.items():
+            if ignore_keys and key in ignore_keys:
+                continue
+
             formatter = self._get_formatter(value)
 
             if formatter != None:

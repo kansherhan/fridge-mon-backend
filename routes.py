@@ -58,7 +58,7 @@ def _register_apps_routes(
     return routes_group
 
 
-def create_routes(app: Sanic):
+def register_routes(app: Sanic):
     _register_routes(app)
     _register_redirect_routes(app)
 

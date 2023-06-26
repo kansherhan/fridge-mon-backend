@@ -4,7 +4,7 @@ from sys import argv as sys_args
 from sanic import Sanic
 from sanic.config import Config
 
-from routes import create_routes
+from routes import register_routes
 from database.connection import create_database_connection
 
 
@@ -37,7 +37,7 @@ def create_app() -> Sanic:
 
     app = Sanic(config.APP_NAME, config=config, ctx=ctx)
 
-    create_routes(app)
+    register_routes(app)
     register_middlewares(app)
 
     app.static("/uploads", abspath("./uploads"), name="uploads")

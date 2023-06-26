@@ -12,5 +12,7 @@ class Employee(TimestampedModel):
 
     icon_url = CharField(null=True)
 
+    __DICT_IGNORE__ = ["password"]
+
     class Meta:
         table_name = "company_employees"

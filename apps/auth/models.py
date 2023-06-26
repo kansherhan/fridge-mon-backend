@@ -5,7 +5,7 @@ from ..employees.models import Employee
 
 
 class EmployeeToken(TimestampedModel):
-    employee = ForeignKeyField(Employee, backref="tokens", lazy_load=False)
+    employee = ForeignKeyField(Employee, backref="tokens")
     token = CharField()
 
     class Meta:
