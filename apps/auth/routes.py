@@ -65,7 +65,7 @@ async def registration(request: Request, body: RegistrationParams):
 
     password_hash = bcrypt.hashpw(
         body.password.encode(),
-        request.app.config.USER_PASSWORD_SALT,
+        bcrypt.gensalt(),
     )
 
     employee = Employee.create(

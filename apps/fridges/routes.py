@@ -15,7 +15,7 @@ from ..enterprises.models import Enterprise
 fridges_routes = Blueprint("fridges", "/")
 
 
-@fridges_routes.get("/enterprise/<enterprises_id:int>/fridge/<fridge_id:int>")
+@fridges_routes.get("/enterprise/<enterprises_id:int>/")
 async def get_fridges_on_enterprises(request: Request, enterprises_id: int):
     """Об всех холодильников в корпорации"""
 

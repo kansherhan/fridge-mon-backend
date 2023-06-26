@@ -2,7 +2,7 @@ from sanic import Request
 
 from apps.auth.models import EmployeeToken as Token
 
-from exceptions.token_error import TokenError
+from exceptions.token import TokenError
 
 
 async def authentication_middleware(request: Request):
