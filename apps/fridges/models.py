@@ -10,8 +10,6 @@ from ..enterprises.models import Enterprise
 from .categories.models import FridgeCategory as Category
 from .manufacturers.models import FridgeManufacturer as Manufacturer
 
-__FRIDGE_BACKREF__ = "fridges"
-
 
 class FridgeStatus(Enum):
     INACTIVE = "inactive"
@@ -22,10 +20,10 @@ class FridgeStatus(Enum):
 class Fridge(TimestampedModel):
     serial_number = CharField()
 
-    company = ForeignKeyField(Company, backref=__FRIDGE_BACKREF__)
-    enterprise = ForeignKeyField(Enterprise, backref=__FRIDGE_BACKREF__)
-    category = ForeignKeyField(Category, backref=__FRIDGE_BACKREF__)
-    manufacturer = ForeignKeyField(Manufacturer, backref=__FRIDGE_BACKREF__)
+    company = ForeignKeyField(Company)
+    enterprise = ForeignKeyField(Enterprise, backref="fridges")
+    category = ForeignKeyField(Category)
+    manufacturer = ForeignKeyField(Manufacturer)
 
     temperature_upper = DecimalField(max_digits=5, decimal_places=2, null=True)
     temperature_lower = DecimalField(max_digits=5, decimal_places=2, null=True)

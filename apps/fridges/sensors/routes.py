@@ -1,28 +1,36 @@
-from sanic import Blueprint, Request
+from sanic import Blueprint, Request, json
 
-routes = Blueprint("sensors", "/sensors")
+from ..models import Fridge
+from .measurements.models import FridgeSensorMeasurement as SensorMeasurement
 
+from .measurements.routes import routes as measurements_routes
 
-@routes.get("/")
-async def get_sensors(request: Request):
-    pass
-
-
-@routes.get("/<sensor_id:int>")
-async def get_sensor(request: Request, sensor_id: int):
-    pass
+sensor_routes = Blueprint("sensors", "/")
 
 
-@routes.post("/")
-async def create_sensor(request: Request):
-    pass
+@sensor_routes.get("/<fridge_id:int>")
+async def get_sensors_by_fridges(request: Request, fridge_id: int):
+    fridge: Fridge = Fridge.get_or_none(Fridge.id == fridge_id)
+
+    fridge_sensors: list[dict] = []
+
+    for sensor in fridge.sensors:
+        sensor_dict = sensor.to_dict()
+
+        measurement: SensorMeasurement = SensorMeasurement.get_or_none(
+            SensorMeasurement.sensor == sensor.id
+        )
+
+        if measurement != None:
+            sensor_dict["measurement"] = measurement.to_dict()
+
+        fridge_sensors.append(sensor_dict)
+
+    return json(fridge_sensors)
 
 
-@routes.put("/<sensor_id:int>")
-async def update_sensor(request: Request, sensor_id: int):
-    pass
-
-
-@routes.delete("/<sensor_id:int>")
-async def remove_sensor(request: Request, sensor_id: int):
-    pass
+routes = Blueprint.group(
+    sensor_routes,
+    measurements_routes,
+    url_prefix="/sensors",
+)

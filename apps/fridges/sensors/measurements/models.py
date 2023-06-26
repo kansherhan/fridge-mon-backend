@@ -23,3 +23,4 @@ class FridgeSensorMeasurement(TimestampedModel):
 
     class Meta:
         table_name = "fridge_sensor_measurements"
+        order_by = "created_at"

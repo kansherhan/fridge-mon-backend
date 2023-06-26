@@ -1,6 +1,7 @@
 import bcrypt
 
 from sanic import Blueprint, Request
+from sanic.response import empty as empty_response
 from sanic.exceptions import Forbidden
 from sanic_ext import validate
 
@@ -22,9 +23,9 @@ async def login(request: Request, body: LoginParams):
 
     if employee != None:
         if bcrypt.checkpw(body.password.encode(), employee.password.encode()):
-            token: Token = employee.tokens[-1]
+            token: Token = employee.tokens[-1] if len(employee.tokens) > 0 else None
 
-            if TokenManager.check_token_lifetime(
+            if token != None and TokenManager.check_token_lifetime(
                 token, request.app.config.TOKEN_LIFETIME
             ):
                 return token.to_json_response()
@@ -35,8 +36,8 @@ async def login(request: Request, body: LoginParams):
                 )
 
                 return token.to_json_response()
-        else:
-            raise Forbidden()
+
+    raise Forbidden()
 
 
 @routes.post("/logout")
@@ -45,6 +46,8 @@ async def logout(request: Request):
 
     for token in user.tokens:
         token.delete_instance()
+
+    return empty_response()
 
 
 @routes.post("/registration", ctx_unauthorized_request=True)
