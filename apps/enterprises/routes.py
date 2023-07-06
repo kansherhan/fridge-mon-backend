@@ -18,6 +18,15 @@ async def get_enterprises(request: Request, company_id: int):
     return models_to_json(company.enterprises)
 
 
+@routes.get("/map/<company_id:int>/<city_id:int>")
+async def get_enterprises(request: Request, company_id: int, city_id: int):
+    """Информация о корпорациях в комании"""
+
+    company: Company = Enterprise.select().where()
+
+    return models_to_json(company.enterprises)
+
+
 @routes.get("/info/<enterprise_id:int>")
 async def get_enterprise(request: Request, enterprise_id: int):
     """Информация о корпорации"""
