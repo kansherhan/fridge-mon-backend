@@ -20,7 +20,7 @@ python server.py --debug
 
 > Можно совмещать аргументы для запуска
 
-> Что бы посмотреть все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs)
+> Что бы посмотреть все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs), [postman](https://www.postman.com/kansherhan/workspace/fridje-mon)
 
 Пути до файлов и картинок:
 
