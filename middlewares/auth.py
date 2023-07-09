@@ -8,9 +8,6 @@ from exceptions.token import TokenError
 async def authentication_middleware(request: Request):
     config = request.app.config
 
-    if not config.AUTHORIZATION:
-        return
-
     if config.DEBUG and request.path.startswith(config.OAS_URL_PREFIX):
         return
 
@@ -26,3 +23,4 @@ async def authentication_middleware(request: Request):
         raise TokenError()
 
     request.ctx.user = token.employee
+    request.ctx.user_token = token

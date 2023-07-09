@@ -2,14 +2,19 @@ from peewee import CharField, ForeignKeyField, FloatField
 
 from database.base_models import TimestampedModel
 
-from ..company.models import Company
+from ..companies.models import Company
+from ..cities.models import City
+
+__ENTERPRISE_BACKREF__ = "enterprises"
 
 
 class Enterprise(TimestampedModel):
     name = CharField()
-    address = CharField()
 
-    company = ForeignKeyField(Company, backref="enterprises")
+    address = CharField(null=True)
+
+    city = ForeignKeyField(City, backref=__ENTERPRISE_BACKREF__)
+    company = ForeignKeyField(Company, backref=__ENTERPRISE_BACKREF__)
 
     latitude = FloatField()
     longitude = FloatField()

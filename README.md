@@ -18,12 +18,6 @@ python server.py
 python server.py --debug
 ```
 
-Запустить программу, без авторизации:
-
-```sh
-python server.py --no-auth
-```
-
 > Можно совмещать аргументы для запуска
 
 > Что бы посмотреть все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs)

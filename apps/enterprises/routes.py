@@ -1,9 +1,10 @@
 from sanic import Blueprint, Request
 
-from ..company.models import Company
+from ..companies.models import Company
+from ..cities.models import City
 from .models import Enterprise
 
-from helper import models_to_json, model_not_none
+from helper import models_to_json, models_to_dicts, model_not_none
 
 
 routes = Blueprint("enterprises", "/enterprises")
@@ -19,12 +20,12 @@ async def get_enterprises(request: Request, company_id: int):
 
 
 @routes.get("/map/<company_id:int>/<city_id:int>")
-async def get_enterprises(request: Request, company_id: int, city_id: int):
+async def get_enterprises_locations(request: Request, company_id: int, city_id: int):
     """Информация о корпорациях в комании"""
 
-    company: Company = Enterprise.select().where()
-
-    return models_to_json(company.enterprises)
+    city: City = model_not_none(City.find_by_id(city_id))
+    city_dict = city.to_dict()
+    city_dict["enterprises"] = models_to_dicts(city.enterprises)
 
 
 @routes.get("/info/<enterprise_id:int>")

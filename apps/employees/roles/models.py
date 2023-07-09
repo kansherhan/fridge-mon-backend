@@ -6,7 +6,7 @@ from database.base_models import BaseModel
 from database.fields import EnumField
 
 from ...employees.models import Employee
-from ...company.models import Company
+from ...companies.models import Company
 from ...enterprises.models import Enterprise
 
 

@@ -2,10 +2,10 @@ import bcrypt
 
 from sanic import Blueprint, Request
 from sanic.response import empty as empty_response
-from sanic.exceptions import Forbidden
 from sanic_ext import validate
 
 from exceptions.has_user import HasUserError
+from exceptions.login import LoginError
 
 from .token import TokenManager
 from .models import EmployeeToken as Token
@@ -38,17 +38,15 @@ async def login(request: Request, body: LoginParams):
 
                 return token.to_json_response()
 
-    raise Forbidden()
+    raise LoginError()
 
 
 @routes.post("/logout")
 async def logout(request: Request):
     """Выйти из системы, удаления всех токенов авторизации"""
 
-    user: Employee = request.ctx.user
-
-    for token in user.tokens:
-        token.delete_instance()
+    user_token: Token = request.ctx.user_token
+    user_token.delete_instance()
 
     return empty_response()
 

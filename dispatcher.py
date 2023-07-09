@@ -24,10 +24,15 @@ def create_config() -> Config:
     config.update_config("./config.py")
 
     config.DEBUG = "--debug" in sys_args
-    config.AUTHORIZATION = not "--no-auth" in sys_args
     config.OAS = config.DEBUG
 
     return config
+
+
+def register_middlewares(app: Sanic):
+    from middlewares.auth import authentication_middleware
+
+    app.register_middleware(authentication_middleware)
 
 
 def create_app() -> Sanic:
@@ -43,9 +48,3 @@ def create_app() -> Sanic:
     app.static("/uploads", abspath("./uploads"), name="uploads")
 
     return app
-
-
-def register_middlewares(app: Sanic):
-    from middlewares.auth import authentication_middleware
-
-    app.register_middleware(authentication_middleware)
