@@ -1,6 +1,8 @@
 # RestAPI для проекта Fridge_Mon
 
-Установка всех зависимостей, нужен Python 3.9.13 (pip 22.0.4)
+## Установка
+
+### Установка всех зависимостей, нужен Python 3.11.4 (pip 23.1.2)
 
 ```sh
 pip install -r requirements.txt
@@ -22,10 +24,26 @@ python server.py --debug
 
 > Что бы посмотреть все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs), [postman](https://www.postman.com/kansherhan/workspace/fridje-mon)
 
-Пути до файлов и картинок:
+> Что бы посмотреть схему базы данных: [dbdocs](https://dbdocs.io/kansherhan/refrigerator-project)
+
+### Пути до файлов и картинок:
 
 ```
 /uploads/images/companies/{file_name}
 /uploads/images/enterprises/{file_name}
 /uploads/images/employees/{file_name}
+```
+
+## Решения проблем
+
+### psycopg2
+
+При установке на линуксе может потребовать пакеты:
+
+```sh
+# Fedora
+sudo dnf install libpq-devel python3-devel gcc
+
+# Ubuntu
+sudo apt install libpq-dev python3-dev gcc
 ```
