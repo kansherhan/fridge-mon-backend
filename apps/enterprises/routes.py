@@ -1,4 +1,5 @@
 from sanic import Blueprint, Request
+from sanic.response import json
 
 from ..companies.models import Company
 from ..cities.models import City
@@ -25,7 +26,17 @@ async def get_enterprises_locations(request: Request, company_id: int, city_id: 
 
     city: City = model_not_none(City.find_by_id(city_id))
     city_dict = city.to_dict()
-    city_dict["enterprises"] = models_to_dicts(city.enterprises)
+
+    enterprises = []
+
+    for enterprise in city.enterprises:
+        enterprise_dict = enterprise.to_dict()
+        enterprise_dict["fridges"] = models_to_dicts(enterprise.fridges)
+        enterprises.append(enterprise_dict)
+
+    city_dict["enterprises"] = enterprises
+
+    return json(city_dict)
 
 
 @routes.get("/info/<enterprise_id:int>")
@@ -34,4 +45,7 @@ async def get_enterprise(request: Request, enterprise_id: int):
 
     enterprise: Enterprise = Enterprise.get_or_none(Enterprise.id == enterprise_id)
 
-    return model_not_none(enterprise).to_json_response()
+    enterprise_dict = model_not_none(enterprise).to_dict()
+    enterprise_dict["fridges"] = models_to_dicts(enterprise.fridges)
+
+    return json(enterprise_dict)

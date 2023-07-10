@@ -1,7 +1,7 @@
 from os.path import abspath
 
 APP_NAME = "fridje_mon"
-APP_HOST = "0.0.0.0"
+APP_HOST = "127.0.0.1"
 APP_PORT = 8000
 
 APPS_FOLDER_NAME = "apps"

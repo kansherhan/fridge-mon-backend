@@ -18,7 +18,8 @@ INSERT INTO
 		longitude,
 		phone,
 		email,
-		icon_url
+		icon_url,
+		city_id
 	)
 VALUES
 	(
@@ -29,7 +30,8 @@ VALUES
 		76.835896,
 		'+7 (778) 147 48 12',
 		'info@magnum.kz',
-		'1.jpg'
+		'1.jpg',
+		34
 	),
 	(
 		1,
@@ -39,7 +41,8 @@ VALUES
 		76.915598,
 		'+7 (707) 852 45 17',
 		'info@magnum.kz',
-		'2.jpg'
+		'2.jpg',
+		34
 	),
 	(
 		1,
@@ -49,7 +52,8 @@ VALUES
 		76.870250,
 		'+7 (776) 123 48 12',
 		'info@magnum.kz',
-		'3.jpg'
+		'3.jpg',
+		34
 	),
 	(
 		1,
@@ -59,7 +63,8 @@ VALUES
 		76.958198,
 		'+7 (778) 212 21 54',
 		'info@magnum.kz',
-		'4.jpg'
+		'4.jpg',
+		34
 	),
 	(
 		1,
@@ -69,7 +74,8 @@ VALUES
 		76.873299,
 		'+7 (770) 787 58 12',
 		'info@magnum.kz',
-		'5.jpg'
+		'5.jpg',
+		34
 	);
 
 INSERT INTO

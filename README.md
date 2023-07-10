@@ -1,5 +1,9 @@
 # RestAPI для проекта Fridge_Mon
 
+> Все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs), [postman](https://www.postman.com/kansherhan/workspace/fridje-mon)
+
+> Схему базы данных: [dbdocs](https://dbdocs.io/kansherhan/refrigerator-project), пароль: 123456
+
 ## Установка
 
 ### Установка всех зависимостей, нужен Python 3.11.4 (pip 23.1.2)
@@ -19,12 +23,6 @@ python server.py
 ```sh
 python server.py --debug
 ```
-
-> Можно совмещать аргументы для запуска
-
-> Что бы посмотреть все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs), [postman](https://www.postman.com/kansherhan/workspace/fridje-mon)
-
-> Что бы посмотреть схему базы данных: [dbdocs](https://dbdocs.io/kansherhan/refrigerator-project)
 
 ### Пути до файлов и картинок:
 
