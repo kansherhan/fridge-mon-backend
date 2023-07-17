@@ -1,7 +1,7 @@
 from os.path import abspath
 
 APP_NAME = "fridje_mon"
-APP_HOST = "127.0.0.1"
+APP_HOST = "0.0.0.0"
 APP_PORT = 8000
 
 APPS_FOLDER_NAME = "apps"
@@ -11,8 +11,8 @@ ROUTE_PREFIX = "/api"
 
 DATABASE_PORT = 5432
 DATABASE_HOST = "127.0.0.1"
-DATABASE_USERNAME = "sherhan"
-DATABASE_PASSWORD = "123456"
+DATABASE_USERNAME = "postgres"
+DATABASE_PASSWORD = "postgres"
 DATABASE_TABLENAME = "fridge_mon"
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -25,6 +25,7 @@ FALLBACK_ERROR_FORMAT = "json"
 TOKEN_LIFETIME = 86400
 TOKEN_LENGTH = 32
 
-CORS_ORIGINS = "*"  # ",".join(["http://localhost", "example.com"])
+CORS = True
+CORS_ORIGINS = "*"
 
 REDIRECTS = {}
