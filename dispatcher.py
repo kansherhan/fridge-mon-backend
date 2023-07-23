@@ -29,7 +29,7 @@ def create_config() -> Config:
     return config
 
 
-def register_middlewares(app: Sanic):
+def register_middlewares(app: Sanic) -> None:
     from middlewares.auth import authentication_middleware
 
     app.register_middleware(authentication_middleware)

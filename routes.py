@@ -9,13 +9,13 @@ __APPS_ROUTES_FILE__ = "routes"
 __APPS_ROUTE_VAR_NAME__ = "routes"
 
 
-def _register_routes(app: Sanic):
+def _register_routes(app: Sanic) -> None:
     @app.get("/", ctx_unauthorized_request=True)
     async def main_page(request: Request):
         return text("Hello, World!")
 
 
-def _register_redirect_routes(app: Sanic):
+def _register_redirect_routes(app: Sanic) -> None:
     redirects_routes = app.config.REDIRECTS
 
     for url, redirect_url in redirects_routes.items():
@@ -58,7 +58,7 @@ def _register_apps_routes(
     return routes_group
 
 
-def register_routes(app: Sanic):
+def register_routes(app: Sanic) -> None:
     _register_routes(app)
     _register_redirect_routes(app)
 
