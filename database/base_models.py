@@ -2,13 +2,15 @@ from enum import Enum
 from datetime import datetime
 from decimal import Decimal
 
+from config import DATETIME_FORMAT
+
 from sanic import Sanic, json
 from peewee import Model, PrimaryKeyField, DateTimeField
 
 
 class BaseModel(Model):
     _formatters = {
-        datetime: lambda value: value.strftime("%Y-%m-%d %H:%M:%S"),
+        datetime: lambda value: value.strftime(DATETIME_FORMAT),
         Decimal: lambda value: "{0:f}".format(value),
         Enum: lambda value: value.value,
     }

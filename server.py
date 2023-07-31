@@ -13,6 +13,7 @@ def bootstrap():
         port=app.config.APP_PORT,
         dev=app.config.DEBUG,
         auto_reload=True,
+        fast=not app.config.DEBUG,
     )
     Sanic.serve(primary=app, app_loader=loader)
 

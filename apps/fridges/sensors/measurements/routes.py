@@ -1,6 +1,8 @@
 from sanic import Blueprint, Request
+from sanic_ext import validate
 
 from .models import FridgeSensorMeasurement as SensorMeasurement
+from .request_params import CreateManufacturersParams
 
 from helper import models_to_json
 
@@ -22,3 +24,9 @@ async def get_sensor_on_measurements(
     )
 
     return models_to_json(measurements)
+
+
+@routes.post("/save")
+@validate(json=CreateManufacturersParams)
+async def fridge_manufacturers_save(request: Request, body: CreateManufacturersParams):
+    pass

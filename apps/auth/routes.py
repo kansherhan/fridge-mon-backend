@@ -9,7 +9,7 @@ from exceptions.login import LoginError
 
 from .token import TokenManager
 from .models import EmployeeToken as Token
-from .query_params import LoginParams, RegistrationParams
+from .request_params import LoginParams, RegistrationParams
 from ..employees.models import Employee
 
 routes = Blueprint("auth", "/auth")
