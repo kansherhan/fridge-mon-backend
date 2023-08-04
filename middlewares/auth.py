@@ -11,7 +11,7 @@ async def authentication_middleware(request: Request):
     if config.DEBUG and request.path.startswith(config.OAS_URL_PREFIX):
         return
 
-    if request.route and hasattr(request.route.ctx, "unauthorized_request"):
+    if request.path in request.app.config.NO_AUTH_URLS:
         return
 
     if not request.token:

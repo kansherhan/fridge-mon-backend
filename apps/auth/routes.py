@@ -15,7 +15,7 @@ from ..employees.models import Employee
 routes = Blueprint("auth", "/auth")
 
 
-@routes.post("/login", ctx_unauthorized_request=True)
+@routes.post("/login")
 @validate(json=LoginParams)
 async def login(request: Request, body: LoginParams):
     """Авторизации в системе"""
@@ -51,7 +51,7 @@ async def logout(request: Request):
     return empty_response()
 
 
-@routes.post("/registration", ctx_unauthorized_request=True)
+@routes.post("/registration")
 @validate(json=RegistrationParams)
 async def registration(request: Request, body: RegistrationParams):
     """Регистрация в системе"""

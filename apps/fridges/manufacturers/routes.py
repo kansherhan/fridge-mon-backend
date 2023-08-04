@@ -3,8 +3,6 @@ from sanic import Blueprint, Request
 from .models import FridgeManufacturer as Manufacturer
 from helper import models_to_json, model_not_none
 
-from ..sensors.measurements.request_params import CreateManufacturersParams
-
 routes = Blueprint("manufacturers", "/manufacturers")
 
 

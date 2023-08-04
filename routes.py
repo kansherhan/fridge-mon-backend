@@ -10,7 +10,7 @@ __APPS_ROUTE_VAR_NAME__ = "routes"
 
 
 def _register_routes(app: Sanic) -> None:
-    @app.get("/", ctx_unauthorized_request=True)
+    @app.get("/")
     async def main_page(request: Request):
         return text("Hello, World!")
 

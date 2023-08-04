@@ -9,11 +9,13 @@ APPS_FOLDER_PATH = abspath(APPS_FOLDER_NAME)
 
 ROUTE_PREFIX = "/api"
 
-DATABASE_PORT = 5432
+DATABASE_PORT = 5433
 DATABASE_HOST = "85.198.90.51"
 DATABASE_USERNAME = "postgres"
 DATABASE_PASSWORD = "postgres"
 DATABASE_TABLENAME = "fridge_mon"
+
+HTTP_ALL_METHODS = False
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -25,7 +27,17 @@ FALLBACK_ERROR_FORMAT = "json"
 TOKEN_LIFETIME = 86400
 TOKEN_LENGTH = 32
 
-CORS = True
-CORS_ORIGINS = "*"
+CORS = False
+CORS_OPTIONS = {
+    "resources": r"/*",
+    "origins": "*",
+    "methods": ["GET", "POST", "HEAD", "OPTIONS"],
+}
 
 REDIRECTS = {}
+
+NO_AUTH_URLS = [
+    "/",
+    "/api/auth/login",
+    "/api/auth/registration",
+]

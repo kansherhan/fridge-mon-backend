@@ -1,7 +1,5 @@
 from sanic import Blueprint, Request
 
-from .models import Fridge
-
 from .manufacturers.routes import routes as manufacturers_routes
 from .categories.routes import routes as categories_routes
 from .products.routes import routes as products_routes

@@ -3,6 +3,9 @@ from sys import argv as sys_args
 
 from sanic import Sanic
 from sanic.config import Config
+from sanic_ext import Extend
+from sanic_cors.extension import CORS
+from sanic_ext.extensions.openapi.extension import OpenAPIExtension
 
 from routes import register_routes
 from database.connection import create_database_connection
@@ -41,6 +44,13 @@ def create_app() -> Sanic:
     ctx = SanicContext(config)
 
     app = Sanic(config.APP_NAME, config=config, ctx=ctx)
+    Extend(
+        app,
+        extensions=[
+            CORS,
+        ],
+        config=config,
+    )
 
     register_routes(app)
     register_middlewares(app)
