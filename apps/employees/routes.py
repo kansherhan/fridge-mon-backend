@@ -1,13 +1,23 @@
-from sanic import Blueprint, Request
+import bcrypt
+
+from sanic import (
+    Blueprint,
+    Request,
+    empty as empty_response,
+)
+from sanic_ext import validate
+
+from .request_params import UpdateEmployeeParams
 
 from .models import Employee
+
 from helper import model_not_none
 
 routes = Blueprint("employees", "/employees")
 
 
 @routes.get("/")
-async def get_current_employees(request: Request):
+async def get_current_employee(request: Request):
     """Данные о текущем пользователе"""
 
     employee: Employee = request.ctx.user
@@ -22,3 +32,27 @@ async def get_employee(request: Request, employee_id: int):
     employee: Employee = Employee.get_or_none(Employee.id == employee_id)
 
     return model_not_none(employee).to_json_response()
+
+
+@routes.patch("/")
+@validate(json=UpdateEmployeeParams)
+async def update_current_employee(request: Request, body: UpdateEmployeeParams):
+    employee: Employee = request.ctx.user
+
+    password_hash = bcrypt.hashpw(
+        body.password.encode(),
+        bcrypt.gensalt(),
+    )
+
+    query = employee.update(
+        {
+            Employee.first_name: body.first_name,
+            Employee.last_name: body.last_name,
+            Employee.email: body.email,
+            Employee.password: password_hash,
+        }
+    ).where(Employee.id == employee.id)
+
+    query.execute()
+
+    return empty_response()

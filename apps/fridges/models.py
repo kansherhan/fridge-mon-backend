@@ -7,8 +7,6 @@ from database.fields import EnumField
 
 from ..companies.models import Company
 from ..enterprises.models import Enterprise
-from .categories.models import FridgeCategory as Category
-from .manufacturers.models import FridgeManufacturer as Manufacturer
 
 
 class FridgeStatus(Enum):
@@ -18,18 +16,15 @@ class FridgeStatus(Enum):
 
 
 class Fridge(TimestampedModel):
-    serial_number = CharField()
+    name = CharField()
+
+    serial_number = CharField(unique=True)
 
     company = ForeignKeyField(Company)
     enterprise = ForeignKeyField(Enterprise, backref="fridges")
-    category = ForeignKeyField(Category)
-    manufacturer = ForeignKeyField(Manufacturer)
 
-    temperature_upper = DecimalField(max_digits=5, decimal_places=2, null=True)
-    temperature_lower = DecimalField(max_digits=5, decimal_places=2, null=True)
-
-    average_temperature = DecimalField(max_digits=7, decimal_places=2, null=True)
-    average_humidity = DecimalField(max_digits=7, decimal_places=2, null=True)
+    temperature_upper = DecimalField(max_digits=5, decimal_places=2)
+    temperature_lower = DecimalField(max_digits=5, decimal_places=2)
 
     status = EnumField(FridgeStatus)
 

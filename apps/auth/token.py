@@ -1,6 +1,6 @@
-from binascii import hexlify
-from os import urandom
 from datetime import datetime
+
+from core.hash import generate_hash
 
 from .models import EmployeeToken as Token
 
@@ -8,7 +8,7 @@ from .models import EmployeeToken as Token
 class TokenManager:
     @classmethod
     def generate_token(cls, length: int) -> str:
-        return hexlify(urandom(length)).decode()[:length]
+        return generate_hash(length)
 
     @classmethod
     def check_token_lifetime(cls, token: Token, token_lifetime: int) -> bool:

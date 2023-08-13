@@ -4,8 +4,8 @@ from sanic import Blueprint, Request
 from sanic.response import empty as empty_response
 from sanic_ext import validate
 
-from exceptions.has_user import HasUserError
-from exceptions.login import LoginError
+from exceptions.auth.has_user import HasUserError
+from exceptions.auth.login import LoginError
 
 from .token import TokenManager
 from .models import EmployeeToken as Token

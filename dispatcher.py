@@ -5,7 +5,6 @@ from sanic import Sanic
 from sanic.config import Config
 from sanic_ext import Extend
 from sanic_cors.extension import CORS
-from sanic_ext.extensions.openapi.extension import OpenAPIExtension
 
 from routes import register_routes
 from database.connection import create_database_connection

@@ -1,14 +1,30 @@
-from sanic import Blueprint, Request
+from sanic import (
+    Blueprint,
+    Request,
+    empty as empty_response,
+    json,
+)
+from sanic_ext import validate
 
-from .manufacturers.routes import routes as manufacturers_routes
-from .categories.routes import routes as categories_routes
-from .products.routes import routes as products_routes
-from .sensors.routes import routes as sensors_routes
+from exceptions.fridge.not_found import NotFoundFridge
 
-from helper import models_to_json
+from .request_params import (
+    CreateFridgeParams,
+    UpdateFridgeParams,
+)
+
+from core.hash import generate_hash
+
+from .models import Fridge
+from .measurements.models import FridgeMeasurement
+from .templates.models import FridgeTemplate
+
+from .measurements.routes import routes as measurements_routes
+from .templates.routes import routes as templates_routes
+
+from helper import models_to_json, models_to_dicts
 
 from ..enterprises.models import Enterprise
-
 
 fridges_routes = Blueprint("fridges", "/")
 
@@ -22,11 +38,80 @@ async def get_fridges_on_enterprises(request: Request, enterprises_id: int):
     return models_to_json(enterprise.fridges)
 
 
+@fridges_routes.get("/<fridge_id:int>")
+async def get_fridge(request: Request, fridge_id: int):
+    fridge: Fridge = Fridge.find_by_id(fridge_id)
+
+    if fridge == None:
+        raise NotFoundFridge()
+
+    fridge_dict = fridge.to_dict()
+    fridge_dict["measurements"] = models_to_dicts(
+        (
+            FridgeMeasurement.select()
+            .where(FridgeMeasurement.fridge == fridge_id)
+            .order_by(FridgeMeasurement.created_at.desc())
+            .limit(10)
+        )
+    )
+
+    return json(fridge_dict)
+
+
+@fridges_routes.post("/")
+@validate(json=CreateFridgeParams)
+async def create_fridge(request: Request, body: CreateFridgeParams):
+    if body.template_id != -1:
+        template: FridgeTemplate = FridgeTemplate.find_by_id(body.template_id)
+
+        if template != None and template.company == body.template_id:
+            body.temperature_lower = template.temperature_lower
+            body.temperature_upper = template.temperature_upper
+
+    fridge: Fridge = Fridge.create(
+        name=body.name,
+        company=body.company,
+        serial_number=generate_hash(32),
+        enterprise=body.enterprise,
+        temperature_lower=body.temperature_lower,
+        temperature_upper=body.temperature_upper,
+    )
+
+    return fridge.to_json_response()
+
+
+@fridges_routes.patch("/<fridge_id:int>")
+@validate(json=UpdateFridgeParams)
+async def update_fridge(request: Request, fridge_id: int, body: UpdateFridgeParams):
+    query = Fridge.update(
+        {
+            Fridge.name: body.name,
+            Fridge.temperature_lower: body.temperature_lower,
+            Fridge.temperature_upper: body.temperature_upper,
+            Fridge.status: body.status,
+        }
+    ).where(Fridge.id == fridge_id)
+
+    query.execute()
+
+    return empty_response()
+
+
+@fridges_routes.delete("/<fridge_id:int>")
+async def remove_fridge(request: Request, fridge_id: int):
+    fridge: Fridge = Fridge.find_by_id(fridge_id)
+
+    if fridge == None:
+        raise NotFoundFridge()
+
+    fridge.delete_instance()
+
+    return empty_response()
+
+
 routes = Blueprint.group(
     fridges_routes,
-    manufacturers_routes,
-    categories_routes,
-    products_routes,
-    sensors_routes,
+    measurements_routes,
+    templates_routes,
     url_prefix="/fridges",
 )
