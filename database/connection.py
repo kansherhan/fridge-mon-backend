@@ -5,7 +5,7 @@ def create_database_connection(
     database_name: str,
     username: str,
     password: str,
-    host: str = "localhost",
+    host: str = "127.0.0.1",
     port: int = 5432,
 ):
     psql_db_connection = PostgresqlDatabase(

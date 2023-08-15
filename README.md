@@ -1,6 +1,6 @@
 # RestAPI для проекта Fridge_Mon
 
-> Все роутинги: [localhost:8000/apidocs](http://localhost:8000/apidocs), [postman](https://www.postman.com/kansherhan/workspace/fridje-mon)
+> Все роутинги: [localhost:8000/api/docs](http://localhost:8000/api/docs), [postman](https://www.postman.com/kansherhan/workspace/fridje-mon)
 
 > Схему базы данных: [dbdocs](https://dbdocs.io/kansherhan/refrigerator-project), пароль: 123456
 

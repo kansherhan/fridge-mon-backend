@@ -1,6 +1,6 @@
-sanic==23.3.0
-sanic-ext==23.3.0
-psycopg2==2.9.6
-peewee==3.16.0
+sanic==23.6.0
+sanic-ext==23.6.0
+psycopg2==2.9.7
+peewee==3.16.3
 bcrypt==4.0.1
 Sanic-Cors==2.2.0

@@ -2,7 +2,7 @@ import bcrypt
 
 from sanic import Blueprint, Request
 from sanic.response import empty as empty_response
-from sanic_ext import validate
+from sanic_ext import validate, openapi
 
 from exceptions.auth.has_user import HasUserError
 from exceptions.auth.login import LoginError
@@ -16,10 +16,10 @@ routes = Blueprint("auth", "/auth")
 
 
 @routes.post("/login")
+@openapi.summary("Авторизации в системе")
+@openapi.description("Дает возможность авторизоваться в системе для дальнейшей работы")
 @validate(json=LoginParams)
 async def login(request: Request, body: LoginParams):
-    """Авторизации в системе"""
-
     employee: Employee = Employee.get_or_none(Employee.email == body.email)
 
     if employee != None:
@@ -42,9 +42,10 @@ async def login(request: Request, body: LoginParams):
 
 
 @routes.post("/logout")
+@openapi.summary("Выйти из системы")
+@openapi.description("И удаления токена авторизации")
+@openapi.response(204)
 async def logout(request: Request):
-    """Выйти из системы, удаления всех токенов авторизации"""
-
     user_token: Token = request.ctx.user_token
     user_token.delete_instance()
 
@@ -52,10 +53,10 @@ async def logout(request: Request):
 
 
 @routes.post("/registration")
+@openapi.summary("Регистрация в системе")
+@openapi.description("Дает возможность авторизоваться в системе для дальнейшей работы")
 @validate(json=RegistrationParams)
 async def registration(request: Request, body: RegistrationParams):
-    """Регистрация в системе"""
-
     employee: Employee = Employee.get_or_none(Employee.email == body.email)
 
     if employee != None:

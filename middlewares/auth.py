@@ -2,7 +2,7 @@ from sanic import Request
 
 from apps.auth.models import EmployeeToken as Token
 
-from exceptions.auth.token import TokenError
+from exceptions.auth.token import TokenError, TokenNotFoundError
 
 
 async def authentication_middleware(request: Request):
@@ -15,7 +15,7 @@ async def authentication_middleware(request: Request):
         return
 
     if not request.token:
-        raise TokenError()
+        raise TokenNotFoundError()
 
     token: Token = Token.get_or_none(Token.token == request.token)
 

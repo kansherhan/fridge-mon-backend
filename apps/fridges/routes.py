@@ -4,9 +4,10 @@ from sanic import (
     empty as empty_response,
     json,
 )
-from sanic_ext import validate
+from sanic.response import JSONResponse, HTTPResponse
+from sanic_ext import validate, openapi
 
-from exceptions.fridge.not_found import NotFoundFridge
+from exceptions.fridge.not_found import FridgeNotFoundError
 
 from .request_params import (
     CreateFridgeParams,
@@ -18,32 +19,35 @@ from core.hash import generate_hash
 from .models import Fridge
 from .measurements.models import FridgeMeasurement
 from .templates.models import FridgeTemplate
+from ..enterprises.models import Enterprise
 
 from .measurements.routes import routes as measurements_routes
 from .templates.routes import routes as templates_routes
 
 from helper import models_to_json, models_to_dicts
 
-from ..enterprises.models import Enterprise
 
 fridges_routes = Blueprint("fridges", "/")
 
 
 @fridges_routes.get("/enterprise/<enterprises_id:int>/")
-async def get_fridges_on_enterprises(request: Request, enterprises_id: int):
-    """Об всех холодильников в корпорации"""
-
+@openapi.summary("Об всех холодильников в корпорации")
+async def get_fridges_on_enterprises(
+    request: Request,
+    enterprises_id: int,
+) -> JSONResponse:
     enterprise: Enterprise = Enterprise.get_or_none(Enterprise.id == enterprises_id)
 
     return models_to_json(enterprise.fridges)
 
 
 @fridges_routes.get("/<fridge_id:int>")
-async def get_fridge(request: Request, fridge_id: int):
+@openapi.summary("Информация об холодильнике")
+async def get_fridge(request: Request, fridge_id: int) -> JSONResponse:
     fridge: Fridge = Fridge.find_by_id(fridge_id)
 
     if fridge == None:
-        raise NotFoundFridge()
+        raise FridgeNotFoundError()
 
     fridge_dict = fridge.to_dict()
     fridge_dict["measurements"] = models_to_dicts(
@@ -59,8 +63,9 @@ async def get_fridge(request: Request, fridge_id: int):
 
 
 @fridges_routes.post("/")
+@openapi.summary("Создать холодильник в корпарации")
 @validate(json=CreateFridgeParams)
-async def create_fridge(request: Request, body: CreateFridgeParams):
+async def create_fridge(request: Request, body: CreateFridgeParams) -> JSONResponse:
     if body.template_id != -1:
         template: FridgeTemplate = FridgeTemplate.find_by_id(body.template_id)
 
@@ -81,8 +86,13 @@ async def create_fridge(request: Request, body: CreateFridgeParams):
 
 
 @fridges_routes.patch("/<fridge_id:int>")
+@openapi.summary("Обновить данные холодильника")
 @validate(json=UpdateFridgeParams)
-async def update_fridge(request: Request, fridge_id: int, body: UpdateFridgeParams):
+async def update_fridge(
+    request: Request,
+    fridge_id: int,
+    body: UpdateFridgeParams,
+) -> HTTPResponse:
     query = Fridge.update(
         {
             Fridge.name: body.name,
@@ -98,11 +108,12 @@ async def update_fridge(request: Request, fridge_id: int, body: UpdateFridgePara
 
 
 @fridges_routes.delete("/<fridge_id:int>")
-async def remove_fridge(request: Request, fridge_id: int):
+@openapi.summary("Удалить холодильник из корпорации")
+async def remove_fridge(request: Request, fridge_id: int) -> HTTPResponse:
     fridge: Fridge = Fridge.find_by_id(fridge_id)
 
     if fridge == None:
-        raise NotFoundFridge()
+        raise FridgeNotFoundError()
 
     fridge.delete_instance()
 

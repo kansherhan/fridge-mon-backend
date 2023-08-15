@@ -4,9 +4,9 @@ from sanic import (
     json,
     empty as empty_response,
 )
-from sanic_ext import validate
+from sanic_ext import validate, openapi
 
-from exceptions.company.not_found import NotFoundCompany
+from exceptions.company.not_found import CompanyNotFoundError
 
 from .models import Company
 from ..employees.roles.models import EmployeeRole, CompanyRole
@@ -23,9 +23,9 @@ routes = Blueprint("companies", "/companies")
 
 
 @routes.get("/")
+@openapi.summary("Список компаний пользователя")
+@openapi.description("Отправляет все компания в котором работает пользователь")
 async def get_companies(request: Request):
-    """Отправляет все компания в котором работает пользователь"""
-
     def _company_exists(role_company: Company, companies: list[Company]) -> bool:
         return any(map(lambda _company: _company.id == role_company.id, companies))
 
@@ -44,9 +44,9 @@ async def get_companies(request: Request):
 
 
 @routes.get("/<company_id:int>")
+@openapi.summary("Информация о компании")
+@openapi.description("Можно получить все компания по ID и их корпорации")
 async def get_company(request: Request, company_id: int):
-    """Можно получить все компания по ID и их корпорации"""
-
     company: Company = model_not_none(Company.get_or_none(Company.id == company_id))
 
     company_dict = company.to_dict()
@@ -56,6 +56,7 @@ async def get_company(request: Request, company_id: int):
 
 
 @routes.post("/")
+@openapi.summary("Создать компанию")
 @validate(json=CreateCompanyParams)
 async def create_company(request: Request, body: CreateCompanyParams):
     user: Employee = request.ctx.user
@@ -75,6 +76,7 @@ async def create_company(request: Request, body: CreateCompanyParams):
 
 
 @routes.patch("/<company_id:int>")
+@openapi.summary("Обновить данные своей компании")
 @validate(json=UpdateCompanyParams)
 async def update_company(request: Request, company_id: int, body: UpdateCompanyParams):
     query = Company.update(
@@ -92,11 +94,12 @@ async def update_company(request: Request, company_id: int, body: UpdateCompanyP
 
 
 @routes.delete("/<company_id:int>")
+@openapi.summary("Удалить компанию которым управляете")
 async def delete_company(request: Request, company_id: int):
     company: Company = Company.find_by_id(company_id)
 
     if company == None:
-        raise NotFoundCompany()
+        raise CompanyNotFoundError()
 
     company.delete_instance()
 

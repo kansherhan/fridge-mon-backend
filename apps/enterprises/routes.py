@@ -4,7 +4,7 @@ from sanic import (
     empty as empty_response,
 )
 from sanic.response import json
-from sanic_ext import validate
+from sanic_ext import validate, openapi
 
 from .request_params import (
     CreateEnterpriseParams,
@@ -15,7 +15,7 @@ from ..companies.models import Company
 from ..cities.models import City
 from .models import Enterprise
 
-from exceptions.enterprise.not_found import NotFoundEnterprise
+from exceptions.enterprise.not_found import EnterpriseNotFoundError
 
 from helper import models_to_json, models_to_dicts, model_not_none
 
@@ -23,18 +23,19 @@ routes = Blueprint("enterprises", "/enterprises")
 
 
 @routes.get("/<company_id:int>")
+@openapi.summary("Информация о корпорациях в комании")
 async def get_enterprises(request: Request, company_id: int):
-    """Информация о корпорациях в комании"""
-
     company: Company = Company.get_or_none(Company.id == company_id)
 
     return models_to_json(company.enterprises)
 
 
 @routes.get("/map/<company_id:int>/<city_id:int>")
+@openapi.summary("Данные корпорация по одному городу")
+@openapi.description(
+    "Отправляет данные корпорация в городе и список холодильников и их последние обновленные данные"
+)
 async def get_enterprises_locations(request: Request, company_id: int, city_id: int):
-    """Информация о корпорациях в комании"""
-
     city: City = model_not_none(City.find_by_id(city_id))
     city_dict = city.to_dict()
 
@@ -51,9 +52,8 @@ async def get_enterprises_locations(request: Request, company_id: int, city_id: 
 
 
 @routes.get("/info/<enterprise_id:int>")
+@openapi.summary("Информация о корпорации")
 async def get_enterprise(request: Request, enterprise_id: int):
-    """Информация о корпорации"""
-
     enterprise: Enterprise = Enterprise.get_or_none(Enterprise.id == enterprise_id)
 
     enterprise_dict = model_not_none(enterprise).to_dict()
@@ -63,6 +63,7 @@ async def get_enterprise(request: Request, enterprise_id: int):
 
 
 @routes.post("/<company_id:int>")
+@openapi.summary("Создать корпорацию в компании")
 @validate(json=CreateEnterpriseParams)
 async def create_enterprise(
     request: Request, company_id: int, body: CreateEnterpriseParams
@@ -79,6 +80,7 @@ async def create_enterprise(
 
 
 @routes.patch("/<enterprise_id:int>")
+@openapi.summary("Обновить данные корпорации")
 @validate(json=UpdateEnterpriseParams)
 async def update_enterprise(
     request: Request, enterprise_id: int, body: UpdateEnterpriseParams
@@ -100,11 +102,12 @@ async def update_enterprise(
 
 
 @routes.delete("/<enterprise_id:int>")
+@openapi.summary("Удалить корпорация из компании")
 async def delete_enterprise(request: Request, enterprise_id: int):
     enterprise: Enterprise = Enterprise.find_by_id(enterprise_id)
 
     if enterprise == None:
-        raise NotFoundEnterprise()
+        raise EnterpriseNotFoundError()
 
     enterprise.delete_instance()
 

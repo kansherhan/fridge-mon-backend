@@ -1,5 +1,6 @@
 from sanic import Blueprint, Request, empty as empty_response
-from sanic_ext import validate
+from sanic.response import JSONResponse, HTTPResponse
+from sanic_ext import validate, openapi
 
 from .request_params import (
     CreateFridgeTemplateParams,
@@ -14,9 +15,8 @@ routes = Blueprint("templates", "/templates")
 
 
 @routes.get("/<company_id:int>/all")
-async def get_templates(request: Request, company_id: int):
-    """Получить все продукты"""
-
+@openapi.summary("Получить список шаблонов холодильника")
+async def get_templates(request: Request, company_id: int) -> JSONResponse:
     templates: list[FridgeTemplate] = FridgeTemplate.select().where(
         FridgeTemplate.company == company_id
     )
@@ -25,8 +25,11 @@ async def get_templates(request: Request, company_id: int):
 
 
 @routes.post("/")
+@openapi.summary("Создать шаблон для создания холодильника")
 @validate(json=CreateFridgeTemplateParams)
-async def create_fridge_template(request: Request, body: CreateFridgeTemplateParams):
+async def create_fridge_template(
+    request: Request, body: CreateFridgeTemplateParams
+) -> JSONResponse:
     template: FridgeTemplate = FridgeTemplate.create(
         name=body.name,
         company=body.company_id,
@@ -38,10 +41,13 @@ async def create_fridge_template(request: Request, body: CreateFridgeTemplatePar
 
 
 @routes.patch("/<template_id:int>")
+@openapi.summary("Обновить шаблон компании")
 @validate(json=UpdateFridgeTemplateParams)
 async def update_fridge_template(
-    request: Request, template_id: int, body: UpdateFridgeTemplateParams
-):
+    request: Request,
+    template_id: int,
+    body: UpdateFridgeTemplateParams,
+) -> HTTPResponse:
     query = FridgeTemplate.update(
         {
             FridgeTemplate.name: body.name,
@@ -56,7 +62,8 @@ async def update_fridge_template(
 
 
 @routes.delete("/<template_id:int>")
-async def delete_fridge_template(request: Request, template_id: int):
+@openapi.summary("Удалить шаблон")
+async def delete_fridge_template(request: Request, template_id: int) -> HTTPResponse:
     template: FridgeTemplate = FridgeTemplate.find_by_id(template_id)
 
     if template == None:

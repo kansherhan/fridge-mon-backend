@@ -15,6 +15,7 @@ def bootstrap():
         auto_reload=True,
         fast=not app.config.DEBUG,
         access_log=app.config.DEBUG,
+        # unix=app.config.APP_UNIX,
     )
     Sanic.serve(primary=app, app_loader=loader)
 
