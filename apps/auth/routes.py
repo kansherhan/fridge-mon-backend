@@ -12,6 +12,7 @@ from .models import EmployeeToken as Token
 from .request_params import LoginParams, RegistrationParams
 from ..employees.models import Employee
 
+
 routes = Blueprint("auth", "/auth")
 
 

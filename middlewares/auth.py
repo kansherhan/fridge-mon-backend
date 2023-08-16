@@ -8,7 +8,7 @@ from exceptions.auth.token import TokenError, TokenNotFoundError
 async def authentication_middleware(request: Request):
     config = request.app.config
 
-    if config.DEBUG and request.path.startswith(config.OAS_URL_PREFIX):
+    if config.OAS and request.path.startswith(config.OAS_URL_PREFIX):
         return
 
     if request.path in request.app.config.NO_AUTH_URLS:

@@ -1,6 +1,6 @@
 from peewee import CharField, ForeignKeyField, FloatField
 
-from database.base_models import TimestampedModel
+from database.models.timestamped import TimestampedModel
 
 from ..companies.models import Company
 from ..cities.models import City

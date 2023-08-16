@@ -1,14 +1,14 @@
 from peewee import PostgresqlDatabase
 
 
-def create_database_connection(
+def CreateDatabaseConnection(
     database_name: str,
     username: str,
     password: str,
     host: str = "127.0.0.1",
     port: int = 5432,
 ):
-    psql_db_connection = PostgresqlDatabase(
+    psql = PostgresqlDatabase(
         database_name,
         user=username,
         password=password,
@@ -16,4 +16,4 @@ def create_database_connection(
         port=port,
     )
 
-    return psql_db_connection
+    return psql

@@ -2,8 +2,8 @@ from enum import Enum
 
 from peewee import ForeignKeyField
 
-from database.base_models import BaseModel
-from database.fields import EnumField
+from database.models.base import BaseModel
+from database.fields.enum import EnumField
 
 from ...employees.models import Employee
 from ...companies.models import Company

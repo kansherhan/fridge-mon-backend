@@ -2,8 +2,8 @@ from enum import Enum
 
 from peewee import ForeignKeyField, CharField, DecimalField
 
-from database.base_models import TimestampedModel
-from database.fields import EnumField
+from database.models.timestamped import TimestampedModel
+from database.fields.enum import EnumField
 
 from ..companies.models import Company
 from ..enterprises.models import Enterprise

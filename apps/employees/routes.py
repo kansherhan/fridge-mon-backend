@@ -13,11 +13,10 @@ from .models import Employee
 
 from helper import model_not_none
 
-
 routes = Blueprint("employees", "/employees")
 
 
-@routes.get("/")
+@routes.get("/me")
 @openapi.summary("Данные о текущем пользователе")
 async def get_current_employee(request: Request):
     employee: Employee = request.ctx.user

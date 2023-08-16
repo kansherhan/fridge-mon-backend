@@ -1,6 +1,6 @@
 from peewee import DecimalField, ForeignKeyField
 
-from database.base_models import TimestampedModel
+from database.models.timestamped import TimestampedModel
 
 from ..models import Fridge
 

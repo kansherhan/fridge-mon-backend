@@ -1,6 +1,6 @@
 from peewee import CharField
 
-from database.base_models import TimestampedModel
+from database.models.timestamped import TimestampedModel
 
 
 class Company(TimestampedModel):

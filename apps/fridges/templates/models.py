@@ -1,7 +1,7 @@
 from peewee import CharField, DecimalField, ForeignKeyField
 
+from database.models.base import BaseModel
 from apps.companies.models import Company
-from database.base_models import BaseModel
 
 
 class FridgeTemplate(BaseModel):

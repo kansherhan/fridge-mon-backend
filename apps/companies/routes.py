@@ -47,9 +47,9 @@ async def get_companies(request: Request):
 @openapi.summary("Информация о компании")
 @openapi.description("Можно получить все компания по ID и их корпорации")
 async def get_company(request: Request, company_id: int):
-    company: Company = model_not_none(Company.get_or_none(Company.id == company_id))
+    company: Company = Company.get_or_none(Company.id == company_id)
 
-    company_dict = company.to_dict()
+    company_dict = model_not_none(company).to_dict()
     company_dict["enterprises"] = models_to_dicts(company.enterprises)
 
     return json(company_dict)
@@ -96,6 +96,7 @@ async def update_company(request: Request, company_id: int, body: UpdateCompanyP
 @routes.delete("/<company_id:int>")
 @openapi.summary("Удалить компанию которым управляете")
 async def delete_company(request: Request, company_id: int):
+    # TODO: Удалить эту способ удаления данных и изменить его на просто в скрывания данных
     company: Company = Company.find_by_id(company_id)
 
     if company == None:

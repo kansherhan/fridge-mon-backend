@@ -11,6 +11,7 @@ from .models import FridgeTemplate
 
 from helper import models_to_json
 
+
 routes = Blueprint("templates", "/templates")
 
 

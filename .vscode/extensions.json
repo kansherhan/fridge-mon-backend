@@ -3,6 +3,8 @@
     "ms-python.python",
     "ms-python.black-formatter",
 
+    "editorconfig.editorconfig",
+
     "wayou.vscode-todo-highlight"
   ]
 }

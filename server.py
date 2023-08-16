@@ -1,21 +1,23 @@
 from sanic import Sanic
+from sanic.config import Config
 from sanic.worker.loader import AppLoader
 
 from dispatcher import create_app
 
 
 def bootstrap():
-    loader = AppLoader(factory=create_app)
-    app = loader.load()
+    loader: AppLoader = AppLoader(factory=create_app)
+    app: Sanic = loader.load()
+    config: Config = app.config
 
     app.prepare(
-        host=app.config.APP_HOST,
-        port=app.config.APP_PORT,
-        dev=app.config.DEBUG,
-        auto_reload=True,
-        fast=not app.config.DEBUG,
-        access_log=app.config.DEBUG,
-        # unix=app.config.APP_UNIX,
+        host=config.APP_HOST,
+        port=config.APP_PORT,
+        dev=config.DEBUG,
+        auto_reload=config.DEBUG,
+        fast=not config.DEBUG,
+        access_log=config.DEBUG,
+        unix=config.APP_UNIX,
     )
     Sanic.serve(primary=app, app_loader=loader)
 

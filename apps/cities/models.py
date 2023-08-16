@@ -1,6 +1,6 @@
 from peewee import CharField, FloatField, ForeignKeyField
 
-from database.base_models import BaseModel
+from database.models.base import BaseModel
 from ..countries.models import Country
 
 

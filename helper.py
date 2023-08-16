@@ -1,7 +1,7 @@
 from sanic import json
-from sanic.exceptions import NotFound
+from sanic.exceptions import BadRequest
 
-from database.base_models import BaseModel
+from database.models.base import BaseModel
 
 
 def models_to_dicts(modals: list[BaseModel]):
@@ -16,4 +16,4 @@ def model_not_none(model: BaseModel, message: str = None):
     if model != None:
         return model
     else:
-        raise NotFound(message)
+        raise BadRequest(message)

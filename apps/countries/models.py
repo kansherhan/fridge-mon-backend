@@ -1,6 +1,6 @@
 from peewee import *
 
-from database.base_models import BaseModel
+from database.models.base import BaseModel
 
 
 class Country(BaseModel):

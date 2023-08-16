@@ -16,7 +16,11 @@ def create_config() -> Config:
     config.update_config("./config.py")
 
     config.DEBUG = "--debug" in sys_args
-    config.OAS = config.DEBUG
+    config.OAS = "--oas" in sys_args
+
+    if config.DEBUG == True:
+        config.OAS = True
+        config.APP_UNIX = None
 
     return config
 

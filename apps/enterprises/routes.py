@@ -19,6 +19,7 @@ from exceptions.enterprise.not_found import EnterpriseNotFoundError
 
 from helper import models_to_json, models_to_dicts, model_not_none
 
+
 routes = Blueprint("enterprises", "/enterprises")
 
 
@@ -104,6 +105,7 @@ async def update_enterprise(
 @routes.delete("/<enterprise_id:int>")
 @openapi.summary("Удалить корпорация из компании")
 async def delete_enterprise(request: Request, enterprise_id: int):
+    # TODO: Усправить удаления корпарации без ссылок на обьекты
     enterprise: Enterprise = Enterprise.find_by_id(enterprise_id)
 
     if enterprise == None:
