@@ -18,18 +18,15 @@ pip install -r requirements.txt
 python server.py
 ```
 
-Запустить программу в режиме разработчика:
+### Аргументы запуска
 
-```sh
-python server.py --debug
-```
+`--debug` - для работы в режиме отладки
+`--oas` - включает документацию(OpenAPI)
 
 ### Пути до файлов и картинок:
 
 ```
-/uploads/images/companies/{file_name}
-/uploads/images/enterprises/{file_name}
-/uploads/images/employees/{file_name}
+/api/images/{file_name}
 ```
 
 ## Решения проблем
