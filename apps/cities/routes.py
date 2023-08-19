@@ -4,6 +4,7 @@ from sanic_ext import openapi
 from .models import City
 from helper import models_to_json, model_not_none
 
+
 routes = Blueprint("cities", "/cities")
 
 

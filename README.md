@@ -26,7 +26,7 @@ python server.py
 ### Пути до файлов и картинок:
 
 ```
-/api/images/{file_name}
+/api/images/get/{file_name}
 ```
 
 ## Решения проблем

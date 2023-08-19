@@ -11,10 +11,14 @@ APPS_FOLDER_PATH = abspath(APPS_FOLDER_NAME)
 ROUTE_PREFIX = "/api"
 
 DATABASE_PORT = 5432
-DATABASE_HOST = "localhost"
+DATABASE_HOST = "127.0.0.1"
 DATABASE_USERNAME = "postgres"
 DATABASE_PASSWORD = "123456"
 DATABASE_TABLENAME = "fridge_mon"
+
+REDIS_PORT = 6379
+REDIS_HOST = "127.0.0.1"
+REDIS_PASSWORD = None  # "123456"
 
 HTTP_ALL_METHODS = False
 
@@ -28,17 +32,46 @@ FALLBACK_ERROR_FORMAT = "json"
 TOKEN_LIFETIME = 86400
 TOKEN_LENGTH = 32
 
+IMAGE_NAME_LENGTH = 64
+
 CORS = False
 CORS_OPTIONS = {
     "resources": r"/*",
     "origins": "*",
-    "methods": ["GET", "POST", "HEAD", "OPTIONS"],
+    "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "HEAD",
+        "OPTIONS",
+        "PATCH",
+        "DELETE",
+    ],
 }
 
-REDIRECTS = {}
+REDIRECTS_URLS = {
+    # "/": "/hello_world", Example, redirect url
+}
 
-NO_AUTH_URLS = [
-    "/",
-    "/api/auth/login",
-    "/api/auth/registration",
+IGNORE_AUTHORIZATION_URLS = [
+    {
+        "url": "/",
+        "has_params": False,
+    },
+    {
+        "url": "/api/docs",
+        "has_params": False,
+    },
+    {
+        "url": "/api/auth/login",
+        "has_params": False,
+    },
+    {
+        "url": "/api/auth/registration",
+        "has_params": False,
+    },
+    {
+        "url": "/api/images/get",
+        "has_params": True,
+    },
 ]

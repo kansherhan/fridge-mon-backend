@@ -19,6 +19,7 @@ from .request_params import (
 
 from helper import models_to_json, model_not_none, models_to_dicts
 
+
 routes = Blueprint("companies", "/companies")
 
 

@@ -5,6 +5,7 @@ from .models import Country
 
 from helper import models_to_json, model_not_none
 
+
 routes = Blueprint("countries", "/countries")
 
 

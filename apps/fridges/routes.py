@@ -14,7 +14,7 @@ from .request_params import (
     UpdateFridgeParams,
 )
 
-from core.hash import generate_hash
+from core.hash import Hash
 
 from .models import Fridge
 from .measurements.models import FridgeMeasurement
@@ -76,7 +76,7 @@ async def create_fridge(request: Request, body: CreateFridgeParams) -> JSONRespo
     fridge: Fridge = Fridge.create(
         name=body.name,
         company=body.company,
-        serial_number=generate_hash(32),
+        serial_number=Hash.generate_hash(32),
         enterprise=body.enterprise,
         temperature_lower=body.temperature_lower,
         temperature_upper=body.temperature_upper,

@@ -1,12 +1,14 @@
-from os.path import abspath
 from sys import argv as sys_args
 
 from sanic import Sanic
 from sanic.config import Config
-from sanic_ext import Extend
-from sanic_cors.extension import CORS
+from sanic.middleware import Middleware, MiddlewareLocation
+from sanic_ext import Extend as SanicAppExtend
+from sanic_cors.extension import CORS as CORSExtension
 
+from core.app.request import AppRequest
 from core.app.context import AppContext
+
 
 from routes import register_routes
 
@@ -25,31 +27,41 @@ def create_config() -> Config:
     return config
 
 
-def register_middlewares(app: Sanic) -> None:
+def register_middlewares(app: Sanic):
     from middlewares.auth import authentication_middleware
-    from middlewares.db import reload_db_connect
 
-    app.register_middleware(reload_db_connect)
-    app.register_middleware(authentication_middleware)
+    middlewares = [
+        Middleware(
+            func=authentication_middleware,
+            location=MiddlewareLocation.REQUEST,
+            priority=10,
+        ),
+    ]
+
+    for middleware in middlewares:
+        app.register_middleware(middleware)
 
 
 def create_app() -> Sanic:
     config = create_config()
-
     ctx = AppContext(config)
 
-    app = Sanic(config.APP_NAME, config=config, ctx=ctx)
-    Extend(
+    app = Sanic(
+        name=config.APP_NAME,
+        config=config,
+        request_class=AppRequest,
+        ctx=ctx,
+    )
+
+    SanicAppExtend(
         app,
         extensions=[
-            CORS,
+            CORSExtension,
         ],
-        config=config,
+        config=app.config,
     )
 
     register_routes(app)
     register_middlewares(app)
-
-    app.static("/uploads", abspath("./uploads"), name="uploads")
 
     return app

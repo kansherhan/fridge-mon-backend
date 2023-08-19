@@ -1,18 +1,22 @@
-from sanic import Request
+from core.app.request import AppRequest
 
+from apps.auth.token import TokenManager
 from apps.auth.models import EmployeeToken as Token
 
-from exceptions.auth.token import TokenError, TokenNotFoundError
+from exceptions.auth.token import (
+    TokenError,
+    TokenNotFoundError,
+    TokenLifeCycleError,
+)
 
 
-async def authentication_middleware(request: Request):
-    config = request.app.config
+async def authentication_middleware(request: AppRequest):
+    config = request.config
 
-    if config.OAS and request.path.startswith(config.OAS_URL_PREFIX):
-        return
-
-    if request.path in request.app.config.NO_AUTH_URLS:
-        return
+    for item in config.IGNORE_AUTHORIZATION_URLS:
+        if request.path.startswith(item["url"]):
+            if item["has_params"] or request.path == item["url"]:
+                return
 
     if not request.token:
         raise TokenNotFoundError()
@@ -22,5 +26,8 @@ async def authentication_middleware(request: Request):
     if token == None:
         raise TokenError()
 
-    request.ctx.user = token.employee
-    request.ctx.user_token = token
+    if not TokenManager.check_token_life_cycle(token, config.TOKEN_LIFETIME):
+        raise TokenLifeCycleError()
+
+    request.user = token.employee
+    request.user_token = token
