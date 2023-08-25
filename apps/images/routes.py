@@ -1,4 +1,4 @@
-from sanic import Request, Blueprint, text
+from sanic import Blueprint, text
 from sanic.request import File
 
 from redis import Redis
@@ -10,7 +10,6 @@ from core.response.image import image
 from exceptions.image_not_found import ImageNotFoundError
 
 from database.models.imageable import ImageableModel
-from ..employees.models import Employee
 
 
 __IMAGE_NAME__ = "image"
@@ -34,13 +33,10 @@ async def get_images(request: AppRequest, image_name: str):
 async def set_image_current_user(request: AppRequest):
     file: File = get_image(request)
 
-    redis: Redis = request.app.ctx.redis
-    user: Employee = request.ctx.user
-
     image_filename = update_image(
-        user,
+        request.user,
         file,
-        redis,
+        request.redis,
         request.config.IMAGE_NAME_LENGTH,
     )
 

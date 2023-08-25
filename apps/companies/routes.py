@@ -6,6 +6,8 @@ from sanic import (
 )
 from sanic_ext import validate, openapi
 
+from peewee import Query
+
 from exceptions.company.not_found import CompanyNotFoundError
 
 from .models import Company
@@ -80,7 +82,7 @@ async def create_company(request: Request, body: CreateCompanyParams):
 @openapi.summary("Обновить данные своей компании")
 @validate(json=UpdateCompanyParams)
 async def update_company(request: Request, company_id: int, body: UpdateCompanyParams):
-    query = Company.update(
+    query: Query = Company.update(
         {
             Company.inn: body.inn,
             Company.name: body.name,

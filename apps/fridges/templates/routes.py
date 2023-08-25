@@ -2,6 +2,8 @@ from sanic import Blueprint, Request, empty as empty_response
 from sanic.response import JSONResponse, HTTPResponse
 from sanic_ext import validate, openapi
 
+from peewee import Query
+
 from .request_params import (
     CreateFridgeTemplateParams,
     UpdateFridgeTemplateParams,
@@ -49,7 +51,7 @@ async def update_fridge_template(
     template_id: int,
     body: UpdateFridgeTemplateParams,
 ) -> HTTPResponse:
-    query = FridgeTemplate.update(
+    query: Query = FridgeTemplate.update(
         {
             FridgeTemplate.name: body.name,
             FridgeTemplate.temperature_lower: body.temperature_lower,

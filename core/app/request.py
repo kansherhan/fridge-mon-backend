@@ -4,6 +4,7 @@ from sanic.response import (
     empty as empty_response,
     HTTPResponse,
 )
+from redis import Redis
 
 
 class AppRequest(Request):
@@ -26,6 +27,10 @@ class AppRequest(Request):
     @property
     def config(self) -> Config:
         return self.app.config
+
+    @property
+    def redis(self) -> Redis:
+        return self.app.ctx.redis
 
     @classmethod
     def empty(cls) -> HTTPResponse:

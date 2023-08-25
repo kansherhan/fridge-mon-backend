@@ -6,6 +6,8 @@ from sanic import (
 from sanic.response import json
 from sanic_ext import validate, openapi
 
+from peewee import Query
+
 from .request_params import (
     CreateEnterpriseParams,
     UpdateEnterpriseParams,
@@ -13,6 +15,8 @@ from .request_params import (
 
 from ..companies.models import Company
 from ..cities.models import City
+from ..fridges.models import Fridge
+from ..fridges.measurements.models import FridgeMeasurement
 from .models import Enterprise
 
 from exceptions.enterprise.not_found import EnterpriseNotFoundError
@@ -44,7 +48,23 @@ async def get_enterprises_locations(request: Request, company_id: int, city_id: 
 
     for enterprise in city.enterprises:
         enterprise_dict = enterprise.to_dict()
-        enterprise_dict["fridges"] = models_to_dicts(enterprise.fridges)
+
+        fridges = []
+
+        for fridge in enterprise.fridges:
+            fridge_dict = fridge.to_dict()
+
+            fridge_dict["measurements"] = models_to_dicts(
+                (
+                    FridgeMeasurement.select()
+                    .where(FridgeMeasurement.fridge == fridge)
+                    .order_by(FridgeMeasurement.created_at.desc())
+                    .limit(1)
+                )
+            )
+            fridges.append(fridge_dict)
+
+        enterprise_dict["fridges"] = fridges
         enterprises.append(enterprise_dict)
 
     city_dict["enterprises"] = enterprises
@@ -86,7 +106,7 @@ async def create_enterprise(
 async def update_enterprise(
     request: Request, enterprise_id: int, body: UpdateEnterpriseParams
 ):
-    query = Enterprise.update(
+    query: Query = Enterprise.update(
         {
             Enterprise.name: body.name,
             Enterprise.address: body.address,

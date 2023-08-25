@@ -7,6 +7,8 @@ from sanic import (
 from sanic.response import JSONResponse, HTTPResponse
 from sanic_ext import validate, openapi
 
+from peewee import Query
+
 from exceptions.fridge.not_found import FridgeNotFoundError
 
 from .request_params import (
@@ -93,7 +95,7 @@ async def update_fridge(
     fridge_id: int,
     body: UpdateFridgeParams,
 ) -> HTTPResponse:
-    query = Fridge.update(
+    query: Query = Fridge.update(
         {
             Fridge.name: body.name,
             Fridge.temperature_lower: body.temperature_lower,

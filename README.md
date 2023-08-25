@@ -1,8 +1,10 @@
 # RestAPI для проекта Fridge_Mon
 
-> Все роутинги: [localhost:8000/api/docs](http://localhost:8000/api/docs), [postman](https://www.postman.com/kansherhan/workspace/fridje-mon)
+> Все роутинги:
+> [85.198.90.69:8000/api/docs](http://85.198.90.69:8000/api/docs),
+> [Postman](https://www.postman.com/kansherhan/workspace/fridje-mon)
 
-> Схему базы данных: [dbdocs](https://dbdocs.io/kansherhan/refrigerator-project), пароль: 123456
+> Схему базы данных: [dbdiagram.io](https://dbdocs.io/kansherhan/refrigerator-project), пароль: 123456
 
 ## Установка
 
@@ -22,6 +24,7 @@ python server.py
 
 `--debug` - для работы в режиме отладки
 `--oas` - включает документацию(OpenAPI)
+`--migrate` - перенос базы данных (Пока делаеться, можеть сломать базу)
 
 ### Пути до файлов и картинок:
 

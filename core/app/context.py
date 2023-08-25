@@ -1,10 +1,11 @@
 from sanic.config import Config
 from redis import Redis
+from types import SimpleNamespace
 
 from database.connect import CreateDatabaseConnection
 
 
-class AppContext:
+class AppContext(SimpleNamespace):
     def __init__(self, config: Config) -> None:
         self.config = config
 
@@ -21,3 +22,5 @@ class AppContext:
             config.DATABASE_HOST,
             config.DATABASE_PORT,
         )
+
+        self.extend = None
