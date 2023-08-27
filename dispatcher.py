@@ -1,5 +1,3 @@
-from sys import argv as sys_args
-
 from sanic import Sanic
 from sanic.config import Config
 from sanic.middleware import Middleware, MiddlewareLocation
@@ -17,13 +15,8 @@ def create_config() -> Config:
     config = Config()
     config.update_config("./config.py")
 
-    config.DEBUG = "--debug" in sys_args
-    config.OAS = "--oas" in sys_args
-    config.MIGRATION = "--migrate" in sys_args
-
     if config.DEBUG == True:
         config.OAS = True
-        config.APP_UNIX = None
 
     return config
 

@@ -9,9 +9,6 @@ from core.response.image import image
 
 from exceptions.image_not_found import ImageNotFoundError
 
-from database.models.imageable import ImageableModel
-
-
 __IMAGE_NAME__ = "image"
 
 routes = Blueprint("images", "/images")
@@ -56,7 +53,7 @@ def get_image(request: AppRequest) -> File:
 
 
 def update_image(
-    model: ImageableModel,
+    model,
     file: File,
     redis: Redis,
     hash_length: int,

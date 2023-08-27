@@ -14,5 +14,9 @@ class Employee(TimestampedModel):
 
     __DICT_IGNORE__ = ["password"]
 
+    @classmethod
+    def find_by_email(cls, email):
+        return cls.get_or_none(cls.email == email)
+
     class Meta:
         table_name = "company_employees"

@@ -1,14 +1,12 @@
-import bcrypt
-
 from sanic import Blueprint
 from sanic_ext import validate, openapi
 
+from exceptions.employee.not_found import EmployeeNotFoundError
+
 from core.app.request import AppRequest
 
-from peewee import Query
 from .models import Employee
 
-from helper import model_not_none
 from .request_params import UpdateEmployeeParams
 
 routes = Blueprint("employees", "/employees")
@@ -25,9 +23,12 @@ async def get_current_employee(request: AppRequest):
 @routes.get("/<employee_id:int>")
 @openapi.summary("Вся информация об пользователе поего ID")
 async def get_employee(request: AppRequest, employee_id: int):
-    employee: Employee = Employee.get_or_none(Employee.id == employee_id)
+    employee: Employee = Employee.find_by_id(employee_id)
 
-    return model_not_none(employee).to_json_response()
+    if employee == None:
+        raise EmployeeNotFoundError()
+
+    return employee.to_json_response()
 
 
 @routes.patch("/")
@@ -36,20 +37,10 @@ async def get_employee(request: AppRequest, employee_id: int):
 async def update_current_employee(request: AppRequest, body: UpdateEmployeeParams):
     employee: Employee = request.user
 
-    password_hash = bcrypt.hashpw(
-        body.password.encode(),
-        bcrypt.gensalt(),
-    )
+    employee.first_name = body.first_name
+    employee.last_name = body.last_name
+    employee.email = body.email
 
-    query: Query = employee.update(
-        {
-            Employee.first_name: body.first_name,
-            Employee.last_name: body.last_name,
-            Employee.email: body.email,
-            Employee.password: password_hash,
-        }
-    ).where(Employee.id == employee.id)
+    employee.save()
 
-    query.execute()
-
-    return request.empty()
+    return employee.to_json_response()

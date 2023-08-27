@@ -8,6 +8,13 @@ class CreateCompanyParams:
 
 
 @dataclass
+class CreateCompanyRoleParams:
+    email: str
+    company: int
+    role: str
+
+
+@dataclass
 class UpdateCompanyParams:
     inn: str
     name: str

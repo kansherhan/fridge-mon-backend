@@ -7,7 +7,6 @@ from database.fields.enum import EnumField
 
 from ...employees.models import Employee
 from ...companies.models import Company
-from ...enterprises.models import Enterprise
 
 
 class CompanyRole(Enum):
@@ -20,7 +19,6 @@ class CompanyRole(Enum):
 class EmployeeRole(BaseModel):
     employee = ForeignKeyField(Employee, backref="roles")
     company = ForeignKeyField(Company)
-    enterprise = ForeignKeyField(Enterprise, null=True)
 
     role = EnumField(CompanyRole)
 

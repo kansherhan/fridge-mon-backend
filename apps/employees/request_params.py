@@ -7,4 +7,3 @@ class UpdateEmployeeParams:
     last_name: str
 
     email: str
-    password: str

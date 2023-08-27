@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 4978
 
-CMD ["python", "server.py", "--debug"]
+CMD ["python", "server.py", "--debug", "--prod"]

@@ -10,6 +10,7 @@ from sanic_ext import validate, openapi
 from peewee import Query
 
 from exceptions.fridge.not_found import FridgeNotFoundError
+from exceptions.data_forbidden import DataForbidden
 
 from .request_params import (
     CreateFridgeParams,
@@ -18,6 +19,7 @@ from .request_params import (
 
 from core.hash import Hash
 
+from database.models.status import DataStatus
 from .models import Fridge
 from .measurements.models import FridgeMeasurement
 from .templates.models import FridgeTemplate
@@ -26,7 +28,7 @@ from ..enterprises.models import Enterprise
 from .measurements.routes import routes as measurements_routes
 from .templates.routes import routes as templates_routes
 
-from helper import models_to_json, models_to_dicts
+from helper import models_to_json, models_to_dicts, model_is_active
 
 
 fridges_routes = Blueprint("fridges", "/")
@@ -38,9 +40,15 @@ async def get_fridges_on_enterprises(
     request: Request,
     enterprises_id: int,
 ) -> JSONResponse:
-    enterprise: Enterprise = Enterprise.get_or_none(Enterprise.id == enterprises_id)
+    enterprise: Enterprise = Enterprise.find_by_id(enterprises_id)
 
-    return models_to_json(enterprise.fridges)
+    fridges: list[Fridge] = []
+
+    for fridge in enterprise.fridges:
+        if model_is_active(fridge):
+            fridges.append(fridge.to_dict())
+
+    return json(fridges)
 
 
 @fridges_routes.get("/<fridge_id:int>")
@@ -50,6 +58,8 @@ async def get_fridge(request: Request, fridge_id: int) -> JSONResponse:
 
     if fridge == None:
         raise FridgeNotFoundError()
+    elif not model_is_active(fridge):
+        raise DataForbidden()
 
     fridge_dict = fridge.to_dict()
     fridge_dict["measurements"] = models_to_dicts(
@@ -95,18 +105,21 @@ async def update_fridge(
     fridge_id: int,
     body: UpdateFridgeParams,
 ) -> HTTPResponse:
-    query: Query = Fridge.update(
-        {
-            Fridge.name: body.name,
-            Fridge.temperature_lower: body.temperature_lower,
-            Fridge.temperature_upper: body.temperature_upper,
-            Fridge.status: body.status,
-        }
-    ).where(Fridge.id == fridge_id)
+    fridge: Fridge = Fridge.find_by_id(fridge_id)
 
-    query.execute()
+    if fridge == None:
+        raise FridgeNotFoundError()
+    elif not model_is_active(fridge):
+        raise DataForbidden()
 
-    return empty_response()
+    fridge.name = body.name
+    fridge.temperature_lower = body.temperature_lower
+    fridge.temperature_upper = body.temperature_upper
+    fridge.status = body.status
+
+    fridge.save()
+
+    return fridge.to_json_response()
 
 
 @fridges_routes.delete("/<fridge_id:int>")
@@ -117,7 +130,7 @@ async def remove_fridge(request: Request, fridge_id: int) -> HTTPResponse:
     if fridge == None:
         raise FridgeNotFoundError()
 
-    fridge.delete_instance()
+    fridge.status = DataStatus.DELETE
 
     return empty_response()
 

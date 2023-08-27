@@ -6,22 +6,21 @@ from sanic import (
 from sanic.response import json
 from sanic_ext import validate, openapi
 
-from peewee import Query
-
 from .request_params import (
     CreateEnterpriseParams,
     UpdateEnterpriseParams,
 )
 
+from database.models.status import DataStatus
 from ..companies.models import Company
 from ..cities.models import City
-from ..fridges.models import Fridge
 from ..fridges.measurements.models import FridgeMeasurement
 from .models import Enterprise
 
 from exceptions.enterprise.not_found import EnterpriseNotFoundError
+from exceptions.data_forbidden import DataForbidden
 
-from helper import models_to_json, models_to_dicts, model_not_none
+from helper import models_to_json, models_to_dicts, model_not_none, model_is_active
 
 
 routes = Blueprint("enterprises", "/enterprises")
@@ -47,6 +46,9 @@ async def get_enterprises_locations(request: Request, company_id: int, city_id: 
     enterprises = []
 
     for enterprise in city.enterprises:
+        if not model_is_active(enterprise):
+            continue
+
         enterprise_dict = enterprise.to_dict()
 
         fridges = []
@@ -77,6 +79,9 @@ async def get_enterprises_locations(request: Request, company_id: int, city_id: 
 async def get_enterprise(request: Request, enterprise_id: int):
     enterprise: Enterprise = Enterprise.get_or_none(Enterprise.id == enterprise_id)
 
+    if not model_is_active(enterprise):
+        raise DataForbidden()
+
     enterprise_dict = model_not_none(enterprise).to_dict()
     enterprise_dict["fridges"] = models_to_dicts(enterprise.fridges)
 
@@ -106,31 +111,34 @@ async def create_enterprise(
 async def update_enterprise(
     request: Request, enterprise_id: int, body: UpdateEnterpriseParams
 ):
-    query: Query = Enterprise.update(
-        {
-            Enterprise.name: body.name,
-            Enterprise.address: body.address,
-            Enterprise.latitude: body.latitude,
-            Enterprise.longitude: body.longitude,
-            Enterprise.phone: body.phone,
-            Enterprise.email: body.email,
-        }
-    ).where(Enterprise.id == enterprise_id)
+    enterprise: Enterprise = Enterprise.find_by_id(enterprise_id)
 
-    query.execute()
+    if enterprise == None:
+        raise EnterpriseNotFoundError()
+    elif not model_is_active(enterprise):
+        raise DataForbidden()
 
-    return empty_response()
+    enterprise.name = body.name
+    enterprise.address = body.address
+    enterprise.latitude = body.latitude
+    enterprise.longitude = body.longitude
+    enterprise.phone = body.phone
+    enterprise.email = body.email
+
+    enterprise.save()
+
+    return enterprise.to_json_response()
 
 
 @routes.delete("/<enterprise_id:int>")
 @openapi.summary("Удалить корпорация из компании")
 async def delete_enterprise(request: Request, enterprise_id: int):
-    # TODO: Усправить удаления корпарации без ссылок на обьекты
     enterprise: Enterprise = Enterprise.find_by_id(enterprise_id)
 
     if enterprise == None:
         raise EnterpriseNotFoundError()
 
-    enterprise.delete_instance()
+    enterprise.status = DataStatus.DELETE
+    enterprise.save()
 
     return empty_response()
