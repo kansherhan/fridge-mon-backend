@@ -10,14 +10,13 @@ PLATFORM = PlatformSystemType[system()]
 DEBUG = "--debug" in sys_args
 PRODUCTION = "--prod" in sys_args
 OAS = "--oas" in sys_args
-MIGRATION = "--migrate" in sys_args
 
 SERVER_HOST = "85.198.90.13" if PRODUCTION else "127.0.0.1"
 
 APP_NAME = "fridge_mon"
 APP_HOST = "0.0.0.0"
 APP_PORT = 4978
-APP_UNIX = "fridge" if PLATFORM == PlatformSystemType.Linux else None
+APP_UNIX = None  # "fridge" if PLATFORM == PlatformSystemType.Linux else None
 APP_ROOT = abspath("./")
 
 APPS_FOLDER_NAME = "apps"
@@ -46,7 +45,7 @@ OAS_UI_SWAGGER = False
 
 FALLBACK_ERROR_FORMAT = "json"
 
-TOKEN_LIFETIME = 86400
+TOKEN_LIFETIME = 86400 * 3  # 3 day
 TOKEN_LENGTH = 64
 
 IMAGE_NAME_LENGTH = 64

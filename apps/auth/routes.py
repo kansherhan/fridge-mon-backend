@@ -6,9 +6,9 @@ from sanic_ext import validate, openapi
 from exceptions.auth.has_user import HasUserError
 from exceptions.auth.login import LoginError
 
+from core.token import TokenManager
 from core.app.request import AppRequest
 
-from .token import TokenManager
 from .models import EmployeeToken as Token
 from .request_params import LoginParams, RegistrationParams
 from ..employees.models import Employee

@@ -7,8 +7,6 @@ from sanic import (
 from sanic.response import JSONResponse, HTTPResponse
 from sanic_ext import validate, openapi
 
-from peewee import Query
-
 from exceptions.fridge.not_found import FridgeNotFoundError
 from exceptions.data_forbidden import DataForbidden
 
@@ -25,10 +23,12 @@ from .measurements.models import FridgeMeasurement
 from .templates.models import FridgeTemplate
 from ..enterprises.models import Enterprise
 
+from .categories.routes import routes as categories_routes
+from .manufacturers.routes import routes as manufacturers_routes
 from .measurements.routes import routes as measurements_routes
 from .templates.routes import routes as templates_routes
 
-from helper import models_to_json, models_to_dicts, model_is_active
+from helper import models_to_dicts, model_is_active
 
 
 fridges_routes = Blueprint("fridges", "/")
@@ -131,12 +131,15 @@ async def remove_fridge(request: Request, fridge_id: int) -> HTTPResponse:
         raise FridgeNotFoundError()
 
     fridge.status = DataStatus.DELETE
+    fridge.save()
 
     return empty_response()
 
 
 routes = Blueprint.group(
     fridges_routes,
+    categories_routes,
+    manufacturers_routes,
     measurements_routes,
     templates_routes,
     url_prefix="/fridges",

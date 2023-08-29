@@ -1,11 +1,11 @@
 from peewee import CharField
 
-from database.models.timestamped import TimestampedModel
+from database.models.timestamped import TimestampedWithIDModel
 from database.models.status import DataStatus
 from database.fields.enum import EnumField
 
 
-class Company(TimestampedModel):
+class Company(TimestampedWithIDModel):
     inn = CharField(max_length=20)
     name = CharField()
 

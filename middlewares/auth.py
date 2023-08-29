@@ -1,6 +1,6 @@
 from core.app.request import AppRequest
 
-from apps.auth.token import TokenManager
+from core.token import TokenManager
 from apps.auth.models import EmployeeToken as Token
 
 from exceptions.auth.token import (

@@ -9,6 +9,7 @@ from .models import Employee
 
 from .request_params import UpdateEmployeeParams
 
+
 routes = Blueprint("employees", "/employees")
 
 

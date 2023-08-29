@@ -6,7 +6,6 @@ from sanic_cors.extension import CORS as CORSExtension
 
 from core.app.request import AppRequest
 from core.app.context import AppContext
-from core.listener.event import ListenerEvent
 
 from routes import register_routes
 
@@ -37,10 +36,8 @@ def register_middlewares(app: Sanic) -> None:
 
 
 def register_listeners(app: Sanic) -> None:
-    from listeners.migration import register_migrate_task
-
     listeners = [
-        (register_migrate_task, ListenerEvent.AFTER_SERVER_START),
+        # (func, ListenerEvent.AFTER_SERVER_START),
     ]
 
     for func, event in listeners:

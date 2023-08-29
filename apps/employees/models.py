@@ -1,9 +1,9 @@
 from peewee import CharField
 
-from database.models.timestamped import TimestampedModel
+from database.models.timestamped import TimestampedWithIDModel
 
 
-class Employee(TimestampedModel):
+class Employee(TimestampedWithIDModel):
     first_name = CharField()
     last_name = CharField()
 

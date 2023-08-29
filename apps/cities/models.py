@@ -1,10 +1,10 @@
 from peewee import CharField, FloatField, ForeignKeyField
 
-from database.models.base import BaseModel
+from database.models.base import BaseModelWithID
 from ..countries.models import Country
 
 
-class City(BaseModel):
+class City(BaseModelWithID):
     name = CharField(unique=True)
 
     latitude = FloatField()

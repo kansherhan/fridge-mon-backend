@@ -11,12 +11,13 @@ from exceptions.image_not_found import ImageNotFoundError
 
 __IMAGE_NAME__ = "image"
 
+
 routes = Blueprint("images", "/images")
 
 
 @routes.get("/get/<image_name>")
 async def get_images(request: AppRequest, image_name: str):
-    redis: Redis = request.app.ctx.redis
+    redis: Redis = request.redis
 
     image_bytes = redis.get(image_name)
 
@@ -46,19 +47,11 @@ async def set_image_current_user(request: AppRequest):
 def get_image(request: AppRequest) -> File:
     file: File = request.files.get(__IMAGE_NAME__)
 
-    if file == None:
-        raise ImageNotFoundError()
-
     return file
 
 
-def update_image(
-    model,
-    file: File,
-    redis: Redis,
-    hash_length: int,
-) -> str | None:
-    if len(file.body) > 0:
+def update_image(model, file: File, redis: Redis, hash_length: int) -> str | None:
+    if file != None and len(file.body) > 0:
         image_filename = Hash.generate_hash(hash_length)
 
         redis.set(image_filename, file.body)

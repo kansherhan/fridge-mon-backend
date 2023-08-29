@@ -1,9 +1,9 @@
 from peewee import *
 
-from database.models.base import BaseModel
+from database.models.base import BaseModelWithID
 
 
-class Country(BaseModel):
+class Country(BaseModelWithID):
     name = CharField(unique=True)
 
     class Meta:

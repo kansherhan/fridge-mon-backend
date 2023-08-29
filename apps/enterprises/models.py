@@ -1,6 +1,6 @@
 from peewee import CharField, ForeignKeyField, FloatField
 
-from database.models.timestamped import TimestampedModel
+from database.models.timestamped import TimestampedWithIDModel
 from database.models.status import DataStatus
 from database.fields.enum import EnumField
 
@@ -10,7 +10,7 @@ from ..cities.models import City
 __ENTERPRISE_BACKREF__ = "enterprises"
 
 
-class Enterprise(TimestampedModel):
+class Enterprise(TimestampedWithIDModel):
     name = CharField()
 
     address = CharField(null=True)

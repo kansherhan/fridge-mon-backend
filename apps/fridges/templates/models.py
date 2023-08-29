@@ -1,10 +1,10 @@
 from peewee import CharField, DecimalField, ForeignKeyField
 
-from database.models.base import BaseModel
+from database.models.base import BaseModelWithID
 from apps.companies.models import Company
 
 
-class FridgeTemplate(BaseModel):
+class FridgeTemplate(BaseModelWithID):
     name = CharField(unique=True)
 
     company = ForeignKeyField(Company, backref="templates")

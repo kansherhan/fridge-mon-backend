@@ -15,17 +15,7 @@ class BaseModel(Model):
         Enum: lambda value: value.value,
     }
 
-    id = PrimaryKeyField(unique=True)
-
     __DICT_IGNORE__ = []
-
-    @classmethod
-    def find_by_id(cls, id: int):
-        return cls.get_or_none(cls.id == id)
-
-    @classmethod
-    def find_all(cls):
-        return cls.select().order_by(cls.id)
 
     @classmethod
     def _get_formatter(cls, value):
@@ -58,4 +48,17 @@ class BaseModel(Model):
 
     class Meta:
         database = Sanic.get_app(APP_NAME).ctx.db
-        order_by = "id"
+
+
+class BaseHelperModel:
+    @classmethod
+    def find_by_id(cls, id: int):
+        return cls.get_or_none(cls.id == id)
+
+    @classmethod
+    def find_all(cls):
+        return cls.select().order_by(cls.id)
+
+
+class BaseModelWithID(BaseModel, BaseHelperModel):
+    id = PrimaryKeyField(unique=True)
