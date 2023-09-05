@@ -2,10 +2,10 @@ from enum import Enum
 from datetime import datetime
 from decimal import Decimal
 
-from config import APP_NAME, DATETIME_FORMAT
-
 from sanic import Sanic, json
 from peewee import Model, PrimaryKeyField
+
+from config import APP_NAME, DATETIME_FORMAT
 
 
 class BaseModel(Model):

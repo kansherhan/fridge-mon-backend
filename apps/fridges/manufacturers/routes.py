@@ -2,6 +2,7 @@ from sanic import Blueprint, Request
 from sanic_ext import openapi
 
 from .models import FridgeManufacturer as Manufacturer
+
 from helper import models_to_json
 
 

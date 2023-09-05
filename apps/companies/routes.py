@@ -6,8 +6,6 @@ from sanic import (
 )
 from sanic_ext import validate, openapi
 
-from peewee import Query
-
 from exceptions.role.owner import CannotCreateOwnerRoleError
 from exceptions.employee.not_found import EmployeeNotFoundError
 from exceptions.company.not_found import CompanyNotFoundError
@@ -79,7 +77,7 @@ async def get_company(request: Request, company_id: int):
 @openapi.summary("Добавить новую роль компанию")
 @validate(json=CreateCompanyRoleParams)
 async def create_company_role(request: Request, body: CreateCompanyRoleParams):
-    employee: Employee = Employee.find_by_email(body.email)
+    employee: Employee = Employee.get_or_none(Employee.username == body.username)
     company: Company = Company.find_by_id(body.company)
     role = CompanyRole[body.role.upper()]
 

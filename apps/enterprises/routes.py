@@ -20,7 +20,12 @@ from .models import Enterprise
 from exceptions.enterprise.not_found import EnterpriseNotFoundError
 from exceptions.data_forbidden import DataForbidden
 
-from helper import models_to_json, models_to_dicts, model_not_none, model_is_active
+from helper import (
+    models_to_json,
+    models_to_dicts,
+    model_not_none,
+    model_is_active,
+)
 
 
 routes = Blueprint("enterprises", "/enterprises")

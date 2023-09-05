@@ -2,6 +2,7 @@ from sanic import Blueprint, Request
 from sanic_ext import openapi
 
 from .models import FridgeCategory as Category
+
 from helper import models_to_json
 
 

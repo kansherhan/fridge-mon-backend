@@ -1,4 +1,4 @@
-from sanic import Blueprint
+from sanic import Blueprint, json
 from sanic_ext import validate, openapi
 
 from exceptions.employee.not_found import EmployeeNotFoundError
@@ -6,6 +6,7 @@ from exceptions.employee.not_found import EmployeeNotFoundError
 from core.app.request import AppRequest
 
 from .models import Employee
+from .roles.models import EmployeeRole
 
 from .request_params import UpdateEmployeeParams
 
@@ -40,8 +41,27 @@ async def update_current_employee(request: AppRequest, body: UpdateEmployeeParam
 
     employee.first_name = body.first_name
     employee.last_name = body.last_name
+    employee.username = body.username
     employee.email = body.email
 
     employee.save()
 
     return employee.to_json_response()
+
+
+@routes.get("/company/<company_id:int>")
+@openapi.summary("Получить все пользователи в компании")
+async def get_all_company_employees(request: AppRequest, company_id: int):
+    roles: list[EmployeeRole] = EmployeeRole.select().where(
+        EmployeeRole.company == company_id
+    )
+
+    employees: list[dict] = []
+
+    for role in roles:
+        employee_dict = role.employee.to_dict()
+        employee_dict["role"] = role.role.value
+
+        employees.append(employee_dict)
+
+    return json(employees)

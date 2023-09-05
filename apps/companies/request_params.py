@@ -9,7 +9,7 @@ class CreateCompanyParams:
 
 @dataclass
 class CreateCompanyRoleParams:
-    email: str
+    username: str
     company: int
     role: str
 

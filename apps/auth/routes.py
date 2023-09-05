@@ -25,7 +25,7 @@ async def login(request: AppRequest, body: LoginParams):
     def check_password(password: str, hash: str) -> bool:
         return bcrypt.checkpw(password.encode(), hash.encode())
 
-    employee: Employee = Employee.get_or_none(Employee.email == body.email)
+    employee: Employee = Employee.get_or_none(Employee.username == body.username)
 
     if employee == None:
         raise LoginError()
@@ -64,7 +64,7 @@ async def registration(request: Request, body: RegistrationParams):
         )
 
     employee: Employee = Employee.get_or_none(
-        Employee.email == body.email,
+        Employee.username == body.username,
     )
 
     if employee != None:
@@ -75,7 +75,7 @@ async def registration(request: Request, body: RegistrationParams):
     employee = Employee.create(
         first_name=body.first_name,
         last_name=body.last_name,
-        email=body.email,
+        username=body.username,
         password=password_hash,
     )
 

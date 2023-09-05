@@ -18,7 +18,7 @@ class CompanyRole(Enum):
 
 class EmployeeRole(BaseModel):
     employee = ForeignKeyField(Employee, backref="roles")
-    company = ForeignKeyField(Company)
+    company = ForeignKeyField(Company, backref="roles")
 
     role = EnumField(CompanyRole)
 

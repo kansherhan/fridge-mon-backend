@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class LoginParams:
-    email: str
+    username: str
     password: str
 
 
@@ -11,5 +11,5 @@ class LoginParams:
 class RegistrationParams:
     first_name: str
     last_name: str
-    email: str
+    username: str
     password: str

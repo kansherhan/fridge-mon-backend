@@ -8,6 +8,7 @@ from exceptions.data_forbidden import DataForbidden
 
 from helper import models_to_json, model_is_active
 
+
 routes = Blueprint("measurements", "/measurements")
 
 
