@@ -4,7 +4,6 @@ from sanic.response import (
     empty as empty_response,
     HTTPResponse,
 )
-from redis import Redis
 from peewee import PostgresqlDatabase
 
 
@@ -28,10 +27,6 @@ class AppRequest(Request):
     @property
     def config(self) -> Config:
         return self.app.config
-
-    @property
-    def redis(self) -> Redis:
-        return self.app.ctx.redis
 
     @property
     def db(self) -> PostgresqlDatabase:

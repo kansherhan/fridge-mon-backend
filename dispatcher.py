@@ -14,9 +14,6 @@ def create_config() -> Config:
     config = Config()
     config.update_config("./config.py")
 
-    if config.DEBUG == True:
-        config.OAS = True
-
     return config
 
 

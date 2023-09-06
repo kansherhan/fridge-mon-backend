@@ -3,15 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class CreateCompanyParams:
-    inn: str
     name: str
-
-
-@dataclass
-class CreateCompanyRoleParams:
-    username: str
-    company: int
-    role: str
 
 
 @dataclass
@@ -21,3 +13,10 @@ class UpdateCompanyParams:
 
     phone: str
     email: str
+
+
+@dataclass
+class CreateCompanyRoleParams:
+    username: str
+    company: int
+    role: str

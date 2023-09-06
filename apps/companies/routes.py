@@ -108,7 +108,6 @@ async def create_company(request: Request, body: CreateCompanyParams):
     user: Employee = request.ctx.user
 
     company: Company = Company.create(
-        inn=body.inn,
         name=body.name,
     )
 

@@ -6,6 +6,7 @@ from exceptions.country.not_found import NotFoundCountyError
 
 from core.app.request import AppRequest
 
+from database.models.status import DataStatus
 from .models import Country
 
 from .request_params import CreateCountryParams, UpdateCountryParams
@@ -19,7 +20,7 @@ routes = Blueprint("countries", "/countries")
 @routes.get("/")
 @openapi.summary("Отправляет список стран")
 async def get_all_countries(request: AppRequest):
-    countries = Country.find_all()
+    countries = Country.select().where(Country.status == DataStatus.ACTIVE)
 
     return models_to_json(countries)
 
@@ -79,6 +80,7 @@ async def delete_country(request: AppRequest, country_id: int):
     if country == None:
         raise NotFoundCountyError()
 
-    country.delete_instance()
+    country.status = DataStatus.DELETE
+    country.save()
 
     return request.empty()

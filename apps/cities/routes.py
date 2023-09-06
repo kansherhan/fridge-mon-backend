@@ -6,6 +6,7 @@ from exceptions.city.not_found import NotFoundCityError
 
 from core.app.request import AppRequest
 
+from database.models.status import DataStatus
 from .models import City
 
 from .request_params import CreateCityParams, UpdateCityParams
@@ -77,6 +78,7 @@ async def delete_city(request: AppRequest, city_id: int):
     if city == None:
         raise NotFoundCityError()
 
-    city.delete_instance()
+    city.status = DataStatus.DELETE
+    city.save()
 
     return request.empty()

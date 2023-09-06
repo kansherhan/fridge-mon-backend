@@ -9,7 +9,7 @@ PLATFORM = PlatformSystemType[system()]
 
 DEBUG = "--debug" in sys_args
 PRODUCTION = "--prod" in sys_args
-OAS = "--oas" in sys_args
+OAS = "--oas" in sys_args or DEBUG
 
 SERVER_HOST = "85.198.90.13" if PRODUCTION else "127.0.0.1"
 
@@ -29,10 +29,6 @@ DATABASE_HOST = SERVER_HOST
 DATABASE_USERNAME = "sherhan"
 DATABASE_PASSWORD = "b2330fc4531de135266de49078c270dd"
 DATABASE_TABLENAME = "fridge_mon"
-
-REDIS_PORT = 5951
-REDIS_HOST = SERVER_HOST
-REDIS_PASSWORD = "716122e5d2fc73f69af7fdfaa366d777"
 
 REQUEST_MAX_SIZE = 3 * pow(10, 6)  # 3 MB(bytes)
 
@@ -85,9 +81,5 @@ IGNORE_AUTHORIZATION_URLS = [
     {
         "url": "/api/auth/registration",
         "has_params": False,
-    },
-    {
-        "url": "/api/images/get",
-        "has_params": True,
     },
 ]
