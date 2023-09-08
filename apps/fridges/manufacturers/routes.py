@@ -22,7 +22,9 @@ routes = Blueprint("manufacturers", "/manufacturers")
 @routes.get("/")
 @openapi.summary("Получить все виды брендов холодильников")
 async def get_manufacturers(request: AppRequest):
-    manufacturers: list[Manufacturer] = Manufacturer.find_all()
+    manufacturers: list[Manufacturer] = Manufacturer.select().where(
+        Manufacturer.status == DataStatus.ACTIVE
+    )
 
     return models_to_json(manufacturers)
 

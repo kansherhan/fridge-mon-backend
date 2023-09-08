@@ -22,7 +22,9 @@ routes = Blueprint("categories", "/categories")
 @routes.get("/")
 @openapi.summary("Получить все категории холодильников")
 async def get_categories(request: AppRequest):
-    categories: list[Category] = Category.find_all()
+    categories: list[Category] = Category.select().where(
+        Category.status == DataStatus.ACTIVE
+    )
 
     return models_to_json(categories)
 

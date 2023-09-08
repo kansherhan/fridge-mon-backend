@@ -45,7 +45,7 @@ async def get_enterprises(request: AppRequest, company_id: int):
         if not model_is_active(enterprise):
             continue
 
-        enterprises.append(enterprise)
+        enterprises.append(enterprise.to_dict())
 
     return json(enterprises)
 
@@ -59,17 +59,22 @@ async def get_enterprises_locations(request: AppRequest, company_id: int, city_i
     city: City = model_not_none(City.find_by_id(city_id))
     city_dict = city.to_dict()
 
-    enterprises = []
+    enterprises = Enterprise.select().where(
+        Enterprise.city == city_id,
+        Enterprise.status == DataStatus.ACTIVE,
+    )
 
-    for enterprise in city.enterprises:
-        if not model_is_active(enterprise):
-            continue
+    enterprises_dict: list[Enterprise] = []
 
+    for enterprise in enterprises:
         enterprise_dict = enterprise.to_dict()
 
         fridges = []
 
         for fridge in enterprise.fridges:
+            if not model_is_active(fridge):
+                continue
+
             fridge_dict = fridge.to_dict()
 
             fridge_dict["measurements"] = models_to_dicts(
@@ -83,9 +88,9 @@ async def get_enterprises_locations(request: AppRequest, company_id: int, city_i
             fridges.append(fridge_dict)
 
         enterprise_dict["fridges"] = fridges
-        enterprises.append(enterprise_dict)
+        enterprises_dict.append(enterprise_dict)
 
-    city_dict["enterprises"] = enterprises
+    city_dict["enterprises"] = enterprises_dict
 
     return json(city_dict)
 
