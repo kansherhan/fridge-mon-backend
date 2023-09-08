@@ -7,9 +7,11 @@ from core.app.request import AppRequest
 from database.models.status import DataStatus
 from ..companies.models import Company
 from ..cities.models import City
+from ..fridges.models import Fridge
 from ..fridges.measurements.models import FridgeMeasurement
 from .models import Enterprise
 
+from exceptions.city.not_found import NotFoundCityError
 from exceptions.company.not_found import CompanyNotFoundError
 from exceptions.enterprise.not_found import EnterpriseNotFoundError
 from exceptions.data_forbidden import DataForbidden
@@ -21,7 +23,7 @@ from .request_params import (
 
 from helper import (
     models_to_dicts,
-    model_not_none,
+    models_to_json,
     model_is_active,
 )
 
@@ -39,15 +41,12 @@ async def get_enterprises(request: AppRequest, company_id: int):
     elif not model_is_active(company):
         raise DataForbidden()
 
-    enterprises: list[Enterprise] = []
+    company_enterprises = Enterprise.select().where(
+        Enterprise.company == company.id,
+        Enterprise.status == DataStatus.ACTIVE,
+    )
 
-    for enterprise in company.enterprises:
-        if not model_is_active(enterprise):
-            continue
-
-        enterprises.append(enterprise.to_dict())
-
-    return json(enterprises)
+    return models_to_json(company_enterprises)
 
 
 @routes.get("/map/<company_id:int>/<city_id:int>")
@@ -56,7 +55,11 @@ async def get_enterprises(request: AppRequest, company_id: int):
     "Отправляет данные корпорация в городе и список холодильников и их последние обновленные данные"
 )
 async def get_enterprises_locations(request: AppRequest, company_id: int, city_id: int):
-    city: City = model_not_none(City.find_by_id(city_id))
+    city: City = City.find_by_id(city_id)
+
+    if city == None:
+        raise NotFoundCityError()
+
     city_dict = city.to_dict()
 
     enterprises = Enterprise.select().where(
@@ -69,12 +72,13 @@ async def get_enterprises_locations(request: AppRequest, company_id: int, city_i
     for enterprise in enterprises:
         enterprise_dict = enterprise.to_dict()
 
-        fridges = []
+        fridges = Fridge.select().where(
+            Fridge.enterprise == enterprise.id,
+            Fridge.status == DataStatus.ACTIVE,
+        )
+        enterprise_fridges = []
 
-        for fridge in enterprise.fridges:
-            if not model_is_active(fridge):
-                continue
-
+        for fridge in fridges:
             fridge_dict = fridge.to_dict()
 
             fridge_dict["measurements"] = models_to_dicts(
@@ -85,9 +89,9 @@ async def get_enterprises_locations(request: AppRequest, company_id: int, city_i
                     .limit(1)
                 )
             )
-            fridges.append(fridge_dict)
+            enterprise_fridges.append(fridge_dict)
 
-        enterprise_dict["fridges"] = fridges
+        enterprise_dict["fridges"] = enterprise_fridges
         enterprises_dict.append(enterprise_dict)
 
     city_dict["enterprises"] = enterprises_dict
@@ -100,11 +104,19 @@ async def get_enterprises_locations(request: AppRequest, company_id: int, city_i
 async def get_enterprise(request: AppRequest, enterprise_id: int):
     enterprise: Enterprise = Enterprise.get_or_none(Enterprise.id == enterprise_id)
 
-    if not model_is_active(enterprise):
+    if enterprise == None:
+        raise EnterpriseNotFoundError()
+    elif not model_is_active(enterprise):
         raise DataForbidden()
 
-    enterprise_dict = model_not_none(enterprise).to_dict()
-    enterprise_dict["fridges"] = models_to_dicts(enterprise.fridges)
+    enterprise_dict = enterprise.to_dict()
+
+    enterprise_fridges = Fridge.select().where(
+        Fridge.enterprise == enterprise.id,
+        Fridge.status == DataStatus.ACTIVE,
+    )
+
+    enterprise_dict["fridges"] = models_to_dicts(enterprise_fridges)
 
     return json(enterprise_dict)
 
@@ -160,6 +172,8 @@ async def delete_enterprise(request: AppRequest, enterprise_id: int):
 
     if enterprise == None:
         raise EnterpriseNotFoundError()
+    elif not model_is_active(enterprise):
+        raise DataForbidden()
 
     enterprise.status = DataStatus.DELETE
     enterprise.save()

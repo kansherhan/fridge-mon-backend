@@ -56,9 +56,9 @@ class Routing:
 
         route_module = import_module(module_path)
 
-        if hasattr(module_path, cls.__APPS_ROUTE_VAR_NAME__):
+        if not hasattr(route_module, cls.__APPS_ROUTE_VAR_NAME__):
             raise RuntimeError(
                 f"В файле у приложения '{app_name}' отсутствует параметр '{cls.__APPS_ROUTE_VAR_NAME__}'!"
             )
 
-        return route_module.routes
+        return getattr(route_module, cls.__APPS_ROUTE_VAR_NAME__)

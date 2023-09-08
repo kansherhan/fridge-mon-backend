@@ -1,18 +1,22 @@
-import bcrypt
+import re as regex
 
-from sanic import Blueprint, Request
+from sanic import Blueprint
 from sanic_ext import validate, openapi
-
-from exceptions.auth.has_user import HasUserError
-from exceptions.auth.login import LoginError
 
 from core.token import TokenManager
 from core.app.request import AppRequest
+from core.auth.password import Password
+
+from exceptions.auth.has_user import HasUserError
+from exceptions.auth.login import LoginError
+from exceptions.employee.username import EmployeeUsernameNotCorectError
 
 from .models import EmployeeToken as Token
 from .request_params import LoginParams, RegistrationParams
 from ..employees.models import Employee
 
+
+__USERNAME_REGEX__ = "^[.A-Za-z0-9_]*$"
 
 routes = Blueprint("auth", "/auth")
 
@@ -22,20 +26,19 @@ routes = Blueprint("auth", "/auth")
 @openapi.description("Дает возможность авторизоваться в системе для дальнейшей работы")
 @validate(json=LoginParams)
 async def login(request: AppRequest, body: LoginParams):
-    def check_password(password: str, hash: str) -> bool:
-        return bcrypt.checkpw(password.encode(), hash.encode())
-
     employee: Employee = Employee.get_or_none(Employee.username == body.username)
 
     if employee == None:
         raise LoginError()
 
-    if not check_password(body.password, employee.password):
+    if not Password.correct(body.password, employee.password):
         raise LoginError()
+
+    token_hash = TokenManager.generate_token(request.config.TOKEN_LENGTH)
 
     token: Token = Token.create(
         employee=employee.id,
-        token=TokenManager.generate_token(request.config.TOKEN_LENGTH),
+        token=token_hash,
     )
 
     return token.to_json_response()
@@ -56,12 +59,9 @@ async def logout(request: AppRequest):
 @openapi.summary("Регистрация в системе")
 @openapi.description("Дает возможность авторизоваться в системе для дальнейшей работы")
 @validate(json=RegistrationParams)
-async def registration(request: Request, body: RegistrationParams):
-    def create_password(password: str) -> str:
-        return bcrypt.hashpw(
-            password.encode(),
-            bcrypt.gensalt(),
-        )
+async def registration(request: AppRequest, body: RegistrationParams):
+    if regex.search(__USERNAME_REGEX__, body.username) == None:
+        raise EmployeeUsernameNotCorectError()
 
     employee: Employee = Employee.get_or_none(
         Employee.username == body.username,
@@ -70,7 +70,7 @@ async def registration(request: Request, body: RegistrationParams):
     if employee != None:
         raise HasUserError()
 
-    password_hash = create_password(body.password)
+    password_hash = Password.hash(body.password)
 
     employee = Employee.create(
         first_name=body.first_name,
@@ -79,9 +79,4 @@ async def registration(request: Request, body: RegistrationParams):
         password=password_hash,
     )
 
-    token: Token = Token.create(
-        employee=employee.id,
-        token=TokenManager.generate_token(request.app.config.TOKEN_LENGTH),
-    )
-
-    return token.to_json_response()
+    return employee.to_json_response()

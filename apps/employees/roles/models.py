@@ -16,6 +16,9 @@ class CompanyRole(Enum):
     VIEWER = "viewer"
 
 
+ROLES = [e.name for e in CompanyRole]
+
+
 class EmployeeRole(BaseModel):
     employee = ForeignKeyField(Employee, backref="roles")
     company = ForeignKeyField(Company, backref="roles")
