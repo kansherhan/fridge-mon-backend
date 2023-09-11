@@ -3,6 +3,7 @@ from sanic_ext import openapi, validate
 
 from exceptions.city.has_city import HasCityError
 from exceptions.city.not_found import NotFoundCityError
+from exceptions.data_forbidden import DataForbidden
 
 from core.app.request import AppRequest
 
@@ -11,7 +12,7 @@ from .models import City
 
 from .request_params import CreateCityParams, UpdateCityParams
 
-from helper import models_to_json, model_not_none
+from helper import models_to_json, model_is_active
 
 
 routes = Blueprint("cities", "/cities")
@@ -21,7 +22,7 @@ routes = Blueprint("cities", "/cities")
 @openapi.summary("Список городов")
 @openapi.description("Отправляеть список городов")
 async def get_all_cities(request: AppRequest):
-    cities = City.find_all()
+    cities = City.select().where(City.status == DataStatus.ACTIVE)
 
     return models_to_json(cities)
 
@@ -30,9 +31,14 @@ async def get_all_cities(request: AppRequest):
 @openapi.summary("Данные о городе")
 @openapi.description("Можно получить данные о родном городе указанием его айдишника")
 async def get_city(request: AppRequest, city_id: int):
-    city = City.find_by_id(city_id)
+    city: City = City.find_by_id(city_id)
 
-    return model_not_none(city).to_json_response()
+    if city == None:
+        raise NotFoundCityError()
+    elif not model_is_active(city):
+        raise DataForbidden()
+
+    return city.to_json_response()
 
 
 @routes.post("/")
@@ -60,6 +66,8 @@ async def update_city(request: AppRequest, city_id: int, body: UpdateCityParams)
 
     if city == None:
         raise NotFoundCityError()
+    elif not model_is_active(city):
+        raise DataForbidden()
 
     city.name = body.name
     city.latitude = body.latitude
@@ -77,6 +85,8 @@ async def delete_city(request: AppRequest, city_id: int):
 
     if city == None:
         raise NotFoundCityError()
+    elif not model_is_active(city):
+        raise DataForbidden()
 
     city.status = DataStatus.DELETE
     city.save()

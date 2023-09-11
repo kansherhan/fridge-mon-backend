@@ -3,15 +3,20 @@ from sanic_ext import openapi, validate
 
 from exceptions.country.has_country import HasCountryError
 from exceptions.country.not_found import NotFoundCountyError
+from exceptions.data_forbidden import DataForbidden
 
 from core.app.request import AppRequest
 
 from database.models.status import DataStatus
 from .models import Country
+from ..cities.models import City
 
 from .request_params import CreateCountryParams, UpdateCountryParams
 
-from helper import models_to_json, model_not_none
+from helper import (
+    models_to_json,
+    model_is_active,
+)
 
 
 routes = Blueprint("countries", "/countries")
@@ -30,15 +35,23 @@ async def get_all_countries(request: AppRequest):
 async def get_country(request: AppRequest, country_id: int):
     country = Country.find_by_id(country_id)
 
-    return model_not_none(country).to_json_response()
+    if country == None:
+        raise NotFoundCountyError()
+    elif not model_is_active(country):
+        raise DataForbidden()
+
+    return country.to_json_response()
 
 
 @routes.get("/<country_id:int>/cities")
 @openapi.summary("Отправляет список городов в стране")
 async def get_country_of_cities(request: AppRequest, country_id: int):
-    country = Country.find_by_id(country_id)
+    cities: list[City] = City.select().where(
+        City.country == country_id,
+        City.status == DataStatus.ACTIVE,
+    )
 
-    return models_to_json(country.cities)
+    return models_to_json(cities)
 
 
 @routes.post("/")
@@ -65,6 +78,8 @@ async def update_country(
 
     if country == None:
         raise NotFoundCountyError()
+    elif country != DataStatus.ACTIVE:
+        raise DataForbidden()
 
     country.name = body.name
 
@@ -79,6 +94,8 @@ async def delete_country(request: AppRequest, country_id: int):
 
     if country == None:
         raise NotFoundCountyError()
+    elif country != DataStatus.ACTIVE:
+        raise DataForbidden()
 
     country.status = DataStatus.DELETE
     country.save()
