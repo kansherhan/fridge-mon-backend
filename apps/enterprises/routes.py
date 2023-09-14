@@ -1,5 +1,5 @@
 from sanic import Blueprint
-from sanic.response import json
+from sanic.response import JSONResponse, json
 from sanic_ext import validate, openapi
 
 from core.app.request import AppRequest
@@ -11,7 +11,7 @@ from ..fridges.models import Fridge
 from ..fridges.measurements.models import FridgeMeasurement
 from .models import Enterprise
 
-from exceptions.city.not_found import NotFoundCityError
+from exceptions.city.not_found import CityNotFoundError
 from exceptions.company.not_found import CompanyNotFoundError
 from exceptions.enterprise.not_found import EnterpriseNotFoundError
 from exceptions.data_forbidden import DataForbidden
@@ -22,9 +22,9 @@ from .request_params import (
 )
 
 from helper import (
+    model,
     models_to_dicts,
     models_to_json,
-    model_is_active,
 )
 
 
@@ -33,13 +33,11 @@ routes = Blueprint("enterprises", "/enterprises")
 
 @routes.get("/<company_id:int>")
 @openapi.summary("Информация о корпорациях в комании")
-async def get_enterprises(request: AppRequest, company_id: int):
-    company: Company = Company.get_or_none(Company.id == company_id)
-
-    if company == None:
-        raise CompanyNotFoundError()
-    elif not model_is_active(company):
-        raise DataForbidden()
+async def get_enterprises(request: AppRequest, company_id: int) -> JSONResponse:
+    company: Company = model(
+        model=Company.get_or_none(Company.id == company_id),
+        not_found_exception=CompanyNotFoundError,
+    )
 
     company_enterprises = Enterprise.select().where(
         Enterprise.company == company.id,
@@ -54,16 +52,21 @@ async def get_enterprises(request: AppRequest, company_id: int):
 @openapi.description(
     "Отправляет данные корпорация в городе и список холодильников и их последние обновленные данные"
 )
-async def get_enterprises_locations(request: AppRequest, company_id: int, city_id: int):
-    city: City = City.find_by_id(city_id)
-
-    if city == None:
-        raise NotFoundCityError()
+async def get_enterprises_locations(
+    request: AppRequest,
+    company_id: int,
+    city_id: int,
+) -> JSONResponse:
+    city: City = model(
+        model=City.find_by_id(city_id),
+        not_found_exception=CityNotFoundError,
+    )
 
     city_dict = city.to_dict()
 
     enterprises = Enterprise.select().where(
         Enterprise.city == city_id,
+        Enterprise.company == company_id,
         Enterprise.status == DataStatus.ACTIVE,
     )
 
@@ -102,12 +105,10 @@ async def get_enterprises_locations(request: AppRequest, company_id: int, city_i
 @routes.get("/info/<enterprise_id:int>")
 @openapi.summary("Информация о корпорации")
 async def get_enterprise(request: AppRequest, enterprise_id: int):
-    enterprise: Enterprise = Enterprise.get_or_none(Enterprise.id == enterprise_id)
-
-    if enterprise == None:
-        raise EnterpriseNotFoundError()
-    elif not model_is_active(enterprise):
-        raise DataForbidden()
+    enterprise: Enterprise = model(
+        model=Enterprise.get_or_none(Enterprise.id == enterprise_id),
+        not_found_exception=EnterpriseNotFoundError,
+    )
 
     enterprise_dict = enterprise.to_dict()
 
@@ -125,8 +126,10 @@ async def get_enterprise(request: AppRequest, enterprise_id: int):
 @openapi.summary("Создать корпорацию в компании")
 @validate(json=CreateEnterpriseParams)
 async def create_enterprise(
-    request: AppRequest, company_id: int, body: CreateEnterpriseParams
-):
+    request: AppRequest,
+    company_id: int,
+    body: CreateEnterpriseParams,
+) -> JSONResponse:
     enterprise: Enterprise = Enterprise.create(
         name=body.name,
         city=body.city,
@@ -146,12 +149,10 @@ async def update_enterprise(
     enterprise_id: int,
     body: UpdateEnterpriseParams,
 ):
-    enterprise: Enterprise = Enterprise.find_by_id(enterprise_id)
-
-    if enterprise == None:
-        raise EnterpriseNotFoundError()
-    elif not model_is_active(enterprise):
-        raise DataForbidden()
+    enterprise: Enterprise = model(
+        model=Enterprise.find_by_id(enterprise_id),
+        not_found_exception=EnterpriseNotFoundError,
+    )
 
     enterprise.name = body.name
     enterprise.address = body.address
@@ -167,13 +168,11 @@ async def update_enterprise(
 
 @routes.delete("/<enterprise_id:int>")
 @openapi.summary("Удалить корпорация из компании")
-async def delete_enterprise(request: AppRequest, enterprise_id: int):
-    enterprise: Enterprise = Enterprise.find_by_id(enterprise_id)
-
-    if enterprise == None:
-        raise EnterpriseNotFoundError()
-    elif not model_is_active(enterprise):
-        raise DataForbidden()
+async def delete_enterprise(request: AppRequest, enterprise_id: int) -> JSONResponse:
+    enterprise: Enterprise = model(
+        model=Enterprise.find_by_id(enterprise_id),
+        not_found_exception=EnterpriseNotFoundError,
+    )
 
     enterprise.status = DataStatus.DELETE
     enterprise.save()

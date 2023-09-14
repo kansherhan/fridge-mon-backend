@@ -2,8 +2,7 @@ from sanic import Blueprint
 from sanic_ext import openapi, validate
 
 from exceptions.country.has_country import HasCountryError
-from exceptions.country.not_found import NotFoundCountyError
-from exceptions.data_forbidden import DataForbidden
+from exceptions.country.not_found import CountyNotFoundError
 
 from core.app.request import AppRequest
 
@@ -14,8 +13,8 @@ from ..cities.models import City
 from .request_params import CreateCountryParams, UpdateCountryParams
 
 from helper import (
+    model,
     models_to_json,
-    model_is_active,
 )
 
 
@@ -33,12 +32,10 @@ async def get_all_countries(request: AppRequest):
 @routes.get("/<country_id:int>")
 @openapi.summary("Данные об одной стране")
 async def get_country(request: AppRequest, country_id: int):
-    country = Country.find_by_id(country_id)
-
-    if country == None:
-        raise NotFoundCountyError()
-    elif not model_is_active(country):
-        raise DataForbidden()
+    country = model(
+        model=Country.find_by_id(country_id),
+        not_found_exception=CountyNotFoundError,
+    )
 
     return country.to_json_response()
 
@@ -74,15 +71,12 @@ async def update_country(
     country_id: int,
     body: UpdateCountryParams,
 ):
-    country: Country = Country.get_or_none(Country.id == country_id)
-
-    if country == None:
-        raise NotFoundCountyError()
-    elif country != DataStatus.ACTIVE:
-        raise DataForbidden()
+    country: Country = model(
+        model=Country.get_or_none(Country.id == country_id),
+        not_found_exception=CountyNotFoundError,
+    )
 
     country.name = body.name
-
     country.save()
 
     return country.to_json_response()
@@ -90,12 +84,10 @@ async def update_country(
 
 @routes.delete("/<country_id:int>")
 async def delete_country(request: AppRequest, country_id: int):
-    country: Country = Country.get_or_none(Country.id == country_id)
-
-    if country == None:
-        raise NotFoundCountyError()
-    elif country != DataStatus.ACTIVE:
-        raise DataForbidden()
+    country: Country = model(
+        model=Country.get_or_none(Country.id == country_id),
+        not_found_exception=CountyNotFoundError,
+    )
 
     country.status = DataStatus.DELETE
     country.save()

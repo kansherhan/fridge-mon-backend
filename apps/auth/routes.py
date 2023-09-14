@@ -7,16 +7,17 @@ from core.token import TokenManager
 from core.app.request import AppRequest
 from core.auth.password import Password
 
+from .models import EmployeeToken as Token
+from ..employees.models import Employee
+
 from exceptions.auth.has_user import HasUserError
 from exceptions.auth.login import LoginError
 from exceptions.employee.username import EmployeeUsernameNotCorectError
 
-from .models import EmployeeToken as Token
-from .request_params import LoginParams, RegistrationParams
-from ..employees.models import Employee
+from .params import LoginParams, RegistrationParams
 
+from ..employees.routes import USERNAME_REGEX
 
-__USERNAME_REGEX__ = "^[.A-Za-z0-9_]*$"
 
 routes = Blueprint("auth", "/auth")
 
@@ -60,7 +61,7 @@ async def logout(request: AppRequest):
 @openapi.description("Дает возможность авторизоваться в системе для дальнейшей работы")
 @validate(json=RegistrationParams)
 async def registration(request: AppRequest, body: RegistrationParams):
-    if regex.search(__USERNAME_REGEX__, body.username) == None:
+    if regex.search(USERNAME_REGEX, body.username) == None:
         raise EmployeeUsernameNotCorectError()
 
     employee: Employee = Employee.get_or_none(

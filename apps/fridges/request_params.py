@@ -10,6 +10,9 @@ class CreateFridgeParams:
 
     template_id: int
 
+    category_id: int
+    manufacturer_id: int
+
     temperature_upper: float
     temperature_lower: float
 

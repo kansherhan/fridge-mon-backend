@@ -2,6 +2,7 @@ from sanic import (
     Blueprint,
     json,
 )
+from sanic.response import JSONResponse
 from sanic_ext import validate, openapi
 
 from core.app.request import AppRequest
@@ -13,7 +14,6 @@ from exceptions.role.owner import (
 from exceptions.role.not_found import NotFoundRoleError
 from exceptions.employee.not_found import EmployeeNotFoundError
 from exceptions.company.not_found import CompanyNotFoundError
-from exceptions.data_forbidden import DataForbidden
 
 from database.models.status import DataStatus
 from .models import Company
@@ -28,9 +28,9 @@ from .request_params import (
 )
 
 from helper import (
+    model,
     models_to_json,
     models_to_dicts,
-    model_is_active,
 )
 
 
@@ -40,7 +40,7 @@ routes = Blueprint("companies", "/companies")
 @routes.get("/")
 @openapi.summary("Список компаний пользователя")
 @openapi.description("Отправляет все компания в котором работает пользователь")
-async def get_companies(request: AppRequest):
+async def get_companies(request: AppRequest) -> JSONResponse:
     def _company_exists(role_company: Company, companies: list[Company]) -> bool:
         return any(map(lambda _company: _company.id == role_company.id, companies))
 
@@ -52,11 +52,9 @@ async def get_companies(request: AppRequest):
     for role in user_roles:
         current_company: Company = role.company
 
-        if not model_is_active(current_company):
-            continue
-
-        if not _company_exists(current_company, companies):
-            companies.append(current_company)
+        if current_company.status == DataStatus.ACTIVE:
+            if not _company_exists(current_company, companies):
+                companies.append(current_company)
 
     return models_to_json(companies)
 
@@ -64,16 +62,14 @@ async def get_companies(request: AppRequest):
 @routes.get("/<company_id:int>")
 @openapi.summary("Информация о компании")
 @openapi.description("Можно получить все компания по ID и их корпорации")
-async def get_company(request: AppRequest, company_id: int):
-    company: Company = Company.get_or_none(Company.id == company_id)
-
-    if company == None:
-        raise CompanyNotFoundError()
-    elif not model_is_active(company):
-        raise DataForbidden()
+async def get_company(request: AppRequest, company_id: int) -> JSONResponse:
+    company: Company = model(
+        model=Company.get_or_none(Company.id == company_id),
+        not_found_exception=CompanyNotFoundError,
+    )
 
     company_enterprises = Enterprise.select().where(
-        Enterprise.id == company.id,
+        Enterprise.company == company.id,
         Enterprise.status == DataStatus.ACTIVE,
     )
 
@@ -86,11 +82,17 @@ async def get_company(request: AppRequest, company_id: int):
 @routes.post("/role")
 @openapi.summary("Добавить новую роль компанию")
 @validate(json=CreateCompanyRoleParams)
-async def create_company_role(request: AppRequest, body: CreateCompanyRoleParams):
+async def create_company_role(
+    request: AppRequest,
+    body: CreateCompanyRoleParams,
+) -> JSONResponse:
     if not body.role.upper() in ROLES:
         raise NotFoundRoleError()
 
     role = CompanyRole[body.role.upper()]
+
+    if role == CompanyRole.OWNER:
+        raise CannotCreateOwnerRoleError()
 
     employee: Employee = Employee.get_or_none(
         Employee.username == body.username,
@@ -99,15 +101,10 @@ async def create_company_role(request: AppRequest, body: CreateCompanyRoleParams
     if employee == None:
         raise EmployeeNotFoundError()
 
-    company: Company = Company.find_by_id(body.company)
-
-    if company == None:
-        raise CompanyNotFoundError()
-    elif not model_is_active(company):
-        raise DataForbidden()
-
-    if role == CompanyRole.OWNER:
-        raise CannotCreateOwnerRoleError()
+    company: Company = model(
+        model=Company.find_by_id(body.company),
+        not_found_exception=CompanyNotFoundError,
+    )
 
     employee_role = EmployeeRole.get_or_none(
         EmployeeRole.employee == employee.id,
@@ -135,7 +132,10 @@ async def create_company_role(request: AppRequest, body: CreateCompanyRoleParams
 @routes.post("/")
 @openapi.summary("Создать компанию")
 @validate(json=CreateCompanyParams)
-async def create_company(request: AppRequest, body: CreateCompanyParams):
+async def create_company(
+    request: AppRequest,
+    body: CreateCompanyParams,
+) -> JSONResponse:
     user: Employee = request.ctx.user
 
     company: Company = Company.create(
@@ -155,14 +155,14 @@ async def create_company(request: AppRequest, body: CreateCompanyParams):
 @openapi.summary("Обновить данные своей компании")
 @validate(json=UpdateCompanyParams)
 async def update_company(
-    request: AppRequest, company_id: int, body: UpdateCompanyParams
-):
-    company: Company = Company.find_by_id(company_id)
-
-    if company == None:
-        raise CompanyNotFoundError()
-    elif not model_is_active(company):
-        raise DataForbidden()
+    request: AppRequest,
+    company_id: int,
+    body: UpdateCompanyParams,
+) -> JSONResponse:
+    company: Company = model(
+        model=Company.find_by_id(company_id),
+        not_found_exception=CompanyNotFoundError,
+    )
 
     company.inn = body.inn
     company.name = body.name
@@ -176,13 +176,11 @@ async def update_company(
 
 @routes.delete("/<company_id:int>")
 @openapi.summary("Удалить компанию которым управляете")
-async def delete_company(request: AppRequest, company_id: int):
-    company: Company = Company.find_by_id(company_id)
-
-    if company == None:
-        raise CompanyNotFoundError()
-    elif not model_is_active(company):
-        raise DataForbidden()
+async def delete_company(request: AppRequest, company_id: int) -> JSONResponse:
+    company: Company = model(
+        model=Company.find_by_id(company_id),
+        not_found_exception=CompanyNotFoundError,
+    )
 
     company.status = DataStatus.DELETE
     company.save()

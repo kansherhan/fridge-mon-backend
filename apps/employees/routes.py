@@ -1,6 +1,9 @@
+import re as regex
+
 from sanic import Blueprint, json
 from sanic_ext import validate, openapi
 
+from exceptions.employee.username import EmployeeUsernameNotCorectError
 from exceptions.employee.not_found import EmployeeNotFoundError
 
 from core.app.request import AppRequest
@@ -10,6 +13,8 @@ from .roles.models import EmployeeRole
 
 from .request_params import UpdateEmployeeParams
 
+
+USERNAME_REGEX = "^[.A-Za-z0-9_]*$"
 
 routes = Blueprint("employees", "/employees")
 
@@ -38,6 +43,9 @@ async def get_employee(request: AppRequest, employee_id: int):
 @validate(json=UpdateEmployeeParams)
 async def update_current_employee(request: AppRequest, body: UpdateEmployeeParams):
     employee: Employee = request.user
+
+    if regex.search(USERNAME_REGEX, body.username) == None:
+        raise EmployeeUsernameNotCorectError()
 
     employee.first_name = body.first_name
     employee.last_name = body.last_name
