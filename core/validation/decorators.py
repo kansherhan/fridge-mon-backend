@@ -13,9 +13,16 @@ from exceptions.validation.request import (
 __DEFAULT_ARGUMENT_NAME__ = "body"
 
 
+def __create_dto(dto: object, validator: BareValidator):
+    if dto != None:
+        return dto(**validator.document)
+    else:
+        return validator.document
+
+
 def validate_json(
     schema,
-    meta_class: object = None,
+    dto: object = None,
     argument_name=__DEFAULT_ARGUMENT_NAME__,
 ):
     validator: BareValidator = Validator(schema)
@@ -29,11 +36,7 @@ def validate_json(
             validation_passed = validator.validate(request.json)
 
             if validation_passed:
-                document = (
-                    meta_class(**validator.document)
-                    if meta_class != None
-                    else validator.document
-                )
+                document = __create_dto(dto, validator)
 
                 kwargs[argument_name] = document
 
@@ -46,8 +49,11 @@ def validate_json(
     return vd
 
 
-# TODO: Доделать для параметров этот декоратор
-def validate_args(schema, argument_name=__DEFAULT_ARGUMENT_NAME__):
+def validate_args(
+    schema,
+    dto: object = None,
+    argument_name=__DEFAULT_ARGUMENT_NAME__,
+):
     validator: BareValidator = Validator(schema)
 
     def vd(f):
@@ -56,7 +62,9 @@ def validate_args(schema, argument_name=__DEFAULT_ARGUMENT_NAME__):
             validation_passed = validator.validate(dict(request.query_args))
 
             if validation_passed:
-                kwargs[argument_name] = validator.document
+                document = __create_dto(dto, validator)
+
+                kwargs[argument_name] = document
 
                 return f(request, *args, **kwargs)
             else:

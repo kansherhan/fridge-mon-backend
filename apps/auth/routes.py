@@ -1,11 +1,12 @@
 import re as regex
 
 from sanic import Blueprint
-from sanic_ext import validate, openapi
+from sanic_ext import openapi
 
 from core.token import TokenManager
 from core.app.request import AppRequest
 from core.auth.password import Password
+from core.validation.decorators import validate_json
 
 from .models import EmployeeToken as Token
 from ..employees.models import Employee
@@ -14,6 +15,7 @@ from exceptions.auth.has_user import HasUserError
 from exceptions.auth.login import LoginError
 from exceptions.employee.username import EmployeeUsernameNotCorectError
 
+from .schemas import LOGIN_SCHEMA, REGISTRATION_SCHEMA
 from .params import LoginParams, RegistrationParams
 
 from ..employees.routes import USERNAME_REGEX
@@ -25,7 +27,7 @@ routes = Blueprint("auth", "/auth")
 @routes.post("/login")
 @openapi.summary("Авторизации в системе")
 @openapi.description("Дает возможность авторизоваться в системе для дальнейшей работы")
-@validate(json=LoginParams)
+@validate_json(schema=LOGIN_SCHEMA, dto=LoginParams)
 async def login(request: AppRequest, body: LoginParams):
     employee: Employee = Employee.get_or_none(Employee.username == body.username)
 
@@ -59,7 +61,7 @@ async def logout(request: AppRequest):
 @routes.post("/registration")
 @openapi.summary("Регистрация в системе")
 @openapi.description("Дает возможность авторизоваться в системе для дальнейшей работы")
-@validate(json=RegistrationParams)
+@validate_json(schema=REGISTRATION_SCHEMA, dto=RegistrationParams)
 async def registration(request: AppRequest, body: RegistrationParams):
     if regex.search(USERNAME_REGEX, body.username) == None:
         raise EmployeeUsernameNotCorectError()
